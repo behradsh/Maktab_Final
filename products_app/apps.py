@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PrudocutsAppConfig(AppConfig):
+class ProductsAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'prudocuts_app'
+    name = 'products_app'
