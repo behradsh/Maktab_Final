@@ -1,0 +1,35 @@
+{% extends 'menu/base.html' %} {% load static %} {% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6 d-flex justify-content-center align-items-center">
+      <img
+        src="{% static 'menu/images/' %}{{ item.name }}.jpg"
+        alt="{{ item.name }}"
+        class="img-fluid w-100"
+      />
+    </div>
+
+    <div class="col-md-6">
+      <h2 class="text-align">{{item.category}}</h2>
+      <h2 class="text-center"><strong>{{ item.name }}</strong></h2>
+      <p class="text-center">{{ item.description }}</p>
+      <p class="text-center fw-bold text-success">price : {{ item.price }} $</p>
+      {% if item.discount %}
+      <p class="text-center text-danger">discount : {{ item.discount}}%</p>
+      {% endif %}
+      <p class="text-center">
+        Estimated Cooking Time: {{ item.estimated_cooking_time }}
+      </p>
+      <p class="text-center">
+        Serving Time Period: {{ item.serving_time_period }}
+      </p>
+      <div class="text-center">
+        <a href="{% url 'menu' %}" class="btn btn-secondary">return to menu</a>
+        <a href="{% url 'add_to_cart' item.id %}" class="btn btn-warning"
+          >add to cart</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

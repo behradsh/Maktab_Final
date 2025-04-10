@@ -1,0 +1,26 @@
+{% extends 'dashboard/base.html'%}
+{% load static %}
+{% block title %}
+    tables Create
+{% endblock %}
+{% block content %}
+<div class="create-car-container">
+    <h1>Create Tables Objects</h1>
+    <form class="form-container" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+            {%if form.errors %}
+                {%for field in form%}
+                    {%for error in field.errors%}
+                        {{error}}
+                    {%endfor%}
+                {%endfor%}
+            {%endif%}
+        <button type="submit">Create</button>
+    </form>
+
+    <a href="#" onclick="history.go(-1)">Back to Tables Page</a>
+</div>
+    <br/>   
+    <br/>
+{% endblock %}

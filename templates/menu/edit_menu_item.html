@@ -1,0 +1,25 @@
+{% extends 'menu/base.html' %}
+{% block title %}Edit Menu Item{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h1>Edit Menu Item: {{ menu_item.name }}</h1>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-fields">
+      {{ form.as_p }}
+    </div>
+
+    <button type="submit" class="btn-save">Save Changes</button>
+  </form>
+
+  <br />
+  <a href="{% url 'delete_menu_item' menu_item.id %}" class="btn-delete">
+    Delete Item
+  </a>
+  <br />
+  <a href="javascript:history.back()" class="btn-back">Back to Menu</a>
+</div>
+{% endblock %}

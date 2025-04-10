@@ -1,0 +1,25 @@
+{% extends 'dashboard/base.html'%}
+{% load static %}
+{% block title %}
+    Messages list
+{% endblock %}
+{% block content %}
+<div class="layout_padding">
+    <a href="#" onclick="history.go(-1)" class="btn btn-primary">Back to Dashboard Page</a>
+    <br/>
+    <br/>
+    <div class="container my-5">
+        <div class="row">
+            {% for item in mails %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="custom-card2">
+                    <p>#{{item.id}}</p>
+                    <h4>{{item.user}}</h4>
+                    <h5>{{item.description}}</h5>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

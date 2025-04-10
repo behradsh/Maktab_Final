@@ -1,0 +1,24 @@
+{% extends 'menu/base.html' %}
+{% block title %}Add Menu Item{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Add Menu Item</h1>
+    <form method="POST" class="form-container">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        {% if form.errors %}
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+        
+        <button type="submit" class="btn-save">Save</button>
+    </form>
+
+    <a href="javascript:history.back()" class="btn-back">Back to Menu</a>
+</div>
+{% endblock %}

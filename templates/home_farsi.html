@@ -1,0 +1,334 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <!-- basic -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- mobile metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <!-- site metas -->
+    <title>Coffo</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- bootstrap css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'home/css/bootstrap.css' %}">
+    <!-- style css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'home/css/style.css' %}">
+    <!-- Responsive-->
+    <link rel="stylesheet" href="{% static 'home/css/responsive.css' %}">
+    <!-- fevicon -->
+    <link rel="icon" href="{% static 'home/images/logo.png' %}" type="image/gif"/>
+    <!-- font css -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="{% static 'home/css/jquery.mCustomScrollbar.min.css' %}">
+    <!-- Tweaks for older IEs-->
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="{% static 'home/css/font-awesome.min.css' %}">
+
+</head>
+<body>
+<div class="header_section">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'home/images/logo.png' %}" alt="image"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'home_farsi' %}">خانه</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}">درباره ما</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'menu' %}">منو</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact_us' %}">تماس با ما</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">English</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <div class="login_bt">
+                        <ul>
+                            <li><a href="{% url 'register' %}"><span class="user_icon"><i class="fa fa-user" aria-hidden="true"></i></span>ثبت نام</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="login_bt">
+                        <ul>
+                            <li><a href="{% url 'login' %}"><span class="user_icon"><i class="fa fa-user" aria-hidden="true"></i></span>ورود به سایت</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </nav>
+    </div>
+    <!-- banner section start -->
+    <div class="banner_section layout_padding">
+        <div class="container">
+            <div id="banner_slider" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="banner_taital_main">
+                                    <h1 class="banner_taital">کافی <br>شاپ</h1>
+                                    <p class="banner_text">سلامتی شما اولویت ماست </p>
+                                    <div class="btn_main">
+                                        <div class="about_bt active"><a href="{% url 'about' %}">درباره ما</a></div>
+                                        <div class="callnow_bt"><a href="{% url 'contact_us' %}">تماس بگیرید</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="banner_taital_main">
+                                    <h1 class="banner_taital">کافی <br>شاپ</h1>
+                                    <p class="banner_text">بهترین انتخابی که تا حالا داشتید </p>
+                                    <div class="btn_main">
+                                        <div class="about_bt active"><a href="{% url 'about' %}">درباره ما</a></div>
+                                        <div class="callnow_bt"><a href="{% url 'contact_us' %}">تماس بگیرید</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a class="carousel-control-prev" href="#banner_slider" role="button" data-slide="prev">
+                    <i class="fa fa-arrow-left"></i>
+                </a>
+                <a class="carousel-control-next" href="#banner_slider" role="button" data-slide="next">
+                    <i class="fa fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- banner section end -->
+</div>
+<!-- header section end -->
+<!-- about section start -->
+<div class="about_section layout_padding">
+    <div class="container">
+        <div class="about_section_2">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="about_taital_box">
+                        <h1 class="about_taital">درباره کافه ما</h1>
+                        <h1 class="about_taital_1">توزیع قهوه</h1>
+                        <p class=" about_text">به وب‌سایت ما خوش آمدید، جایی که هر فنجان با عشق و بهترین دانه‌ها تهیه می‌شود. چه برای یک اسپرسوی سریع آمده باشید یا یک دورهمی صمیمی، ما در هر جرعه گرما را به شما هدیه می‌دهیم!</p>
+                        <div class="readmore_btn"><a href="#">اطلاعات بیشتر</a></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="image_iman"><img src="{% static 'home/images/about-img2.png' %}" alt="image"
+                                                 class="about_img"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- about section end -->
+<!-- coffee section start -->
+<div class="coffee_section layout_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="coffee_taital">پیشنهاد ما</h1>
+            </div>
+        </div>
+    </div>
+    <div class="coffee_section_2">
+        <div id="main_slider" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6">
+                                <div class="coffee_img"><img src="{% static 'home/images/img-01.jpg' %}" alt="image">
+                                </div>
+                                <div class="coffee_box">
+                                    <h3 class="types_text">انواع قهوه</h3>
+                                    <p class="looking_text">برای کسب اطلاعات بیشتر به صفحه ی زیر مراجعه کنید</p>
+                                    <div class="read_bt"><a href="{% url 'menu' %}">اطلاعات بیشتر</a></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="coffee_img"><img src="{% static 'home/images/img-02.jpg' %}" alt="image">
+                                </div>
+                                <div class="coffee_box">
+                                    <h3 class="types_text">انواع دانه‌های قهوه</h3>
+                                    <p class="looking_text">برای کسب اطلاعات بیشتر به صفحه ی زیر مراجعه کنید</p>
+                                    <div class="read_bt"><a href="{% url 'menu' %}">اطلاعات بیشتر</a></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="coffee_img"><img src="{% static 'home/images/img-03.jpg' %}" alt="image">
+                                </div>
+                                <div class="coffee_box">
+                                    <h3 class="types_text">قهوه و شیرینی</h3>
+                                    <p class="looking_text">برای کسب اطلاعات بیشتر به صفحه ی زیر مراجعه کنید</p>
+                                    <div class="read_bt"><a href="{% url 'menu' %}">اطلاعات بیشتر</a></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="coffee_img"><img src="{% static 'home/images/img-04.png' %}" alt="image">
+                                </div>
+                                <div class="coffee_box">
+                                    <h3 class="types_text">قهوه بیرون‌بر</h3>
+                                    <p class="looking_text">برای کسب اطلاعات بیشتر به صفحه ی زیر مراجعه کنید</p>
+                                    <div class="read_bt"><a href="{% url 'menu' %}">اطلاعات بیشتر</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+<!-- coffee section end -->
+<!-- client section start -->
+<div class="client_section layout_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1 class="about_taital">نظر برخی از مشتری هایمان</h1>
+            </div>
+        </div>
+        
+        <div id="custom_slider" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                {% for message in latest_messages %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <div class="client_section_2">
+                        <div class="client_taital_main">
+                            <div class="client_right">
+                                <h3 class="moark_text">{{ message.user_email }}</h3>
+                                <p class="client_text">{{ message.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center">هنوز هیچ نظری ثبت نشده است.</p>
+                {% endfor %}
+            </div>
+            <a class="carousel-control-prev" href="#custom_slider" role="button" data-slide="prev">
+                <i class="fa fa-arrow-left"></i>
+            </a>
+            <a class="carousel-control-next" href="#custom_slider" role="button" data-slide="next">
+                <i class="fa fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+<!-- client section end -->
+<!-- blog section start -->
+<div class="blog_section layout_padding" style="padding-bottom: 20px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="about_taital">بلاگ های ما</h1>
+            </div>
+        </div>
+        <div class="blog_section_2">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="blog_box">
+                        <div class="blog_img"><img src="{% static 'home/images/blog-img1.png' %}" alt="image"></div>
+                        <h4 class="date_text">ششم اسفند</h4>
+                        <h4 class="prep_text">تکنیک‌های آماده‌سازی قهوه ما</h4>
+                        <p class="lorem_text">هر فنجان قهوه با دقت و مهارت آماده می‌شود تا بهترین طعم را تجربه کنید. لذت ببرید از قهوه‌ای که با عشق درست شده</p>
+                    </div>
+                    <div class="read_btn"><a href="#">اطلاعات بیشتر</a></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="blog_box">
+                        <div class="blog_img"><img src="{% static 'home/images/blog-img2.png' %}" alt="image"></div>
+                        <h4 class="date_text">ششم اسفند</h4>
+                        <h4 class="prep_text">لذت بردن از بهترین قهوه</h4>
+                        <p class="lorem_text">هر بار که قهوه‌ای از ما می‌نوشید، به دنیای طعم‌های خاص و تازه وارد می‌شوید. قهوه‌ای که همیشه شما را راضی نگه می‌دارد.</p>
+                    </div>
+                    <div class="read_btn"><a href="#">اطلاعات بیشتر</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- blog section end -->
+<!-- footer section start -->
+<br/>
+<div class="footer_section layout_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="footer_social_icon">
+                    <ul>
+                        <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                    </ul>
+                </div>
+                <div class="location_text">register
+                    <ul>
+                        <li>
+                            <a href="#">
+                                <i class="fa fa-phone" aria-hidden="true"></i><span class="padding_left_10"> 0981234567890 </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa fa-envelope" aria-hidden="true"></i><span class="padding_left_10"> demo@gmail.com </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- footer section end -->
+<!-- copyright section start -->
+<div class="copyright_section">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <p class="copyright_text">تمام حقوق اين وب‌سايت، برای گروه 1 مکتب 123 است. </p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- copyright section end -->
+<!-- Javascript files-->
+<script src="{% static 'home/js/jquery.min.js' %}"></script>
+<script src="{% static 'home/js/popper.min.js' %}"></script>
+<script src="{% static 'home/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'home/js/jquery-3.0.0.min.js' %}"></script>
+<script src="{% static 'home/js/plugin.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+
+<!-- sidebar -->
+<script src="{% static 'home/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+<script src="{% static 'home/js/custom.js' %}"></script>
+</body>
+</html>

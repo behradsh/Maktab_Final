@@ -1,0 +1,175 @@
+[
+  {
+    "model": "menu.Category",
+    "pk": 1,
+    "fields": {
+      "title": "Coffee"
+    }
+  },
+  {
+    "model": "menu.Category",
+    "pk": 2,
+    "fields": {
+      "title": "Dessert"
+    }
+  },
+  {
+    "model": "menu.Category",
+    "pk": 3,
+    "fields": {
+      "title": "Breakfast"
+    }
+  },
+  {
+    "model": "menu.Category",
+    "pk": 4,
+    "fields": {
+      "title": "Fast Food"
+    }
+  },
+  {
+    "model": "menu.Category",
+    "pk": 5,
+    "fields": {
+      "title": "Beverages"
+    }
+  },
+  {
+    "model": "menu.Category",
+    "pk": 6,
+    "fields": {
+      "title": "Salads"
+    }
+  },
+  {
+    "model": "menu.Category",
+    "pk": 7,
+    "fields": {
+      "title": "Pasta"
+    }
+  },
+  {
+    "model": "menu.Category",
+    "pk": 8,
+    "fields": {
+      "title": "Seafood"
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 1,
+    "fields": {
+      "name": "Espresso",
+      "price": "2.50",
+      "category": 1,
+      "discount": 10,
+      "serving_time_period": 15,
+      "estimated_cooking_time": 5,
+      "description": "A strong and rich coffee with an intense flavor, perfect for an energy boost."
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 2,
+    "fields": {
+      "name": "Cheesecake",
+      "price": "4.99",
+      "category": 2,
+      "discount": 5,
+      "serving_time_period": 30,
+      "estimated_cooking_time": 10,
+      "description": "A creamy and delicious cheesecake with a buttery crust, perfect for sweet cravings."
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 3,
+    "fields": {
+      "name": "Pancakes",
+      "price": "6.00",
+      "category": 3,
+      "discount": 15,
+      "serving_time_period": 40,
+      "estimated_cooking_time": 12,
+      "description": "Fluffy pancakes served with syrup and fresh fruits, a perfect start to the day."
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 4,
+    "fields": {
+      "name": "French Toast",
+      "price": "6.75",
+      "category": 3,
+      "discount": 12,
+      "serving_time_period": 45,
+      "estimated_cooking_time": 15,
+      "description": "Golden and crispy French toast topped with powdered sugar and maple syrup."
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 5,
+    "fields": {
+      "name": "Burger",
+      "price": "8.50",
+      "category": 4,
+      "discount": 10,
+      "serving_time_period": 20,
+      "estimated_cooking_time": 15,
+      "description": "A juicy grilled burger with fresh lettuce, tomato, and cheese, served with fries."
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 6,
+    "fields": {
+      "name": "Iced Tea",
+      "price": "3.00",
+      "category": 5,
+      "discount": 5,
+      "serving_time_period": 10,
+      "estimated_cooking_time": 2,
+      "description": "A refreshing cold tea with lemon and mint, perfect for a hot day."
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 7,
+    "fields": {
+      "name": "Grilled Salmon",
+      "price": "14.99",
+      "category": 8,
+      "discount": 10,
+      "serving_time_period": 30,
+      "estimated_cooking_time": 20,
+      "description": "A perfectly grilled salmon fillet served with lemon butter sauce and vegetables."
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 8,
+    "fields": {
+      "name": "Shrimp Pasta",
+      "price": "13.50",
+      "category": 7,
+      "discount": 8,
+      "serving_time_period": 35,
+      "estimated_cooking_time": 25,
+      "description": "A creamy shrimp pasta with garlic, parmesan, and fresh herbs."
+    }
+  },
+  {
+    "model": "menu.MenuItems",
+    "pk": 9,
+    "fields": {
+      "name": "Fruit Salad",
+      "price": "5.99",
+      "category": 6,
+      "discount": 5,
+      "serving_time_period": 15,
+      "estimated_cooking_time": 5,
+      "description": "A refreshing mix of seasonal fruits served with a light honey dressing."
+    }
+  }
+]

@@ -1,0 +1,31 @@
+{% extends 'dashboard/base.html'%}
+{% load static %}
+{% block title %}
+    tables list
+{% endblock %}
+{% block content %}
+<div class="layout_padding">
+    <a href="#" onclick="history.go(-1)" class="btn btn-primary">Back to Tables Page</a>
+    <br/>
+    <br/>
+    <a href="{% url 'table_create'%}" class="btn btn-primary">Add Table</a>
+    <div class="container my-5">
+        <div class="row">
+            {% for item in tables %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="custom-card">
+                    <img src="{% static 'dashboard/images/card4.jpeg' %}" class="card-img-top" alt="Card Image">
+                    <div class="card-body">
+                        <p class="card-title">#{{item.table_number}}</p>
+                        <p class="card-text">{{item.status}}</p>
+                        <p class="card-text">{{item.current_order}}</p>
+                        <p class="card-text"><a href="#">New Order<a></p>
+                        <a href="{% url 'table_update' item.id %}" class="btn btn-primary">Edit</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

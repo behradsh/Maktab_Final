@@ -1,0 +1,27 @@
+{% extends 'dashboard/base.html'%}
+{% load static %}
+{% block title %}
+    OrderDetails Edit
+{% endblock %}
+{% block content %}
+<div class="edit-table-container">
+    <h1>Edit OrderDetails</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {%if form.errors %} 
+            {%for field in form%}
+                {%for error in field.errors%}
+                    {{error}} 
+                {%endfor%}
+            {%endfor%}
+        {%endif%}
+        <button type="submit">Save Changes</button>
+    </form>
+    <br/>   
+    <a href="./delete_orderdetail.html"><button>Delete Object</button></a>
+    <br/>
+    <br/>
+    <a href="#" onclick="history.go(-1)">Back to OrderDetails Page</a>
+
+{% endblock %}

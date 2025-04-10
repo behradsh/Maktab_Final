@@ -1,0 +1,32 @@
+{% extends 'dashboard/base.html'%}
+{% load static %}
+{% block title %}
+    Receipts
+{% endblock %}
+{% block content %}
+<div class="layout_padding">
+    <a href="#" onclick="history.go(-1)" class="btn btn-primary">Back to Orders Page</a>
+    <br/>
+    <br/>
+    <a href="{% url 'create_receipt'%}" class="btn btn-primary">Add Receipt</a>
+    <div class="container my-5">
+        <div class="row">
+            {% for receipt in receipts %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="custom-card">
+                    <div class="card-body">
+                        <p class="card-title">#{{receipt.order}}</p>
+                        <p class="card-text">{{receipt.status}}</p>
+                        <p class="card-text">{{receipt.total_price}}</p>
+                        <p class="card-text">{{receipt.final_price}}</p>
+                        <p class="card-text">{{receipt.timestamp}}</p>
+                        <p class="card-text"><a href="#">New Receipt<a></p>
+                        <a href="{% url 'edit_receipt' receipt.id %}" class="btn btn-primary">Edit</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
