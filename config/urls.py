@@ -23,4 +23,5 @@ urlpatterns=i18n_patterns(
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('', include('core_app.urls')),
+    path('', include('users_app.urls')),
 )
