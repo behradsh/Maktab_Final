@@ -4,6 +4,6 @@ from .models import Store
 @admin.register(Store)
 class StoreAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'owner', 'address', 'created_at')
-    search_fields = ('name', 'owner__username', 'address')
-    list_filter = ('created_at',)
+    search_fields = ('name', 'owner__username','owner__email','address')
+    list_filter = ('created_at','is_active')
     readonly_fields = ('created_at',)

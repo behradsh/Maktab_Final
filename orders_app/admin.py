@@ -4,22 +4,45 @@ from .models import Orders,OrderItems
 
 @admin.register(Orders)
 class OrdersAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer', 'status', 'final_price', 'discount', 'created_at')
+    list_display = ('id', 'customer', 'status', 'discount', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('customer__username', 'customer__email', 'id')
-    readonly_fields = ('created_at', 'final_price')
+    readonly_fields = ('created_at',)
     fieldsets = (
         (None, {
             'fields': ('customer', 'address', 'status')
         }),
         ('Pricing', {
-            'fields': ('final_price', 'discount')
+            'fields': ('total_amount', 'discount')
         }),
         ('Metadata', {
             'fields': ('created_at',),
             'classes': ('collapse',)
         }),
     )
+    # Add ability to update order status in bulk
+    actions = ['mark_as_processing', 'mark_as_shipped', 'mark_as_delivered', 'mark_as_cancelled']
+
+    def mark_as_processing(self, request, queryset):
+        queryset.update(status='processing')
+
+    mark_as_processing.short_description = "Mark selected orders as processing"
+
+    def mark_as_shipped(self, request, queryset):
+        queryset.update(status='shipped')
+
+    mark_as_shipped.short_description = "Mark selected orders as shipped"
+
+    def mark_as_delivered(self, request, queryset):
+        queryset.update(status='delivered')
+
+    mark_as_delivered.short_description = "Mark selected orders as delivered"
+
+    def mark_as_cancelled(self, request, queryset):
+        queryset.update(status='cancelled')
+
+    mark_as_cancelled.short_description = "Mark selected orders as cancelled"
+
 
 @admin.register(OrderItems)
 class OrderItemsAdmin(admin.ModelAdmin):

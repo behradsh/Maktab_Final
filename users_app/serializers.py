@@ -1,81 +1,151 @@
 from rest_framework import serializers
 from .models import CustomUser
+from store_app.models import Store
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import Group
 from django.contrib.auth import login,logout,authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.models import Group
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import (RefreshToken, AccessToken,TokenError)
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-class CustomerRegistrationSerializer(serializers.ModelSerializer):
+
+#Serializers for Customer Registration
+class UserRegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True,required=True,
+                                     validators=[validate_password])
+    password2 = serializers.CharField(write_only=True,required=True)
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'phone_number', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def create(self, validated_data):
-        user = CustomUser.objects.create_user(
-            username=validated_data.get('username'),
-            email=validated_data.get('email'),
-            phone_number=validated_data.get('phone_number'),
-            password=validated_data['password'],
-            is_customer=True
+        fields = ['username','email','password','password2','phone',
+                  'first_name','last_name','gender']
+        extra_kwargs = {
+                        'first_name': {'required':True},
+                        'last_name': {'required':True},
+                        'email': {'required':True},
+                        'phone': {'required':True},
+                        }
+    def validate(self,attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({'password':'Passwords fields didnt match'})
+        return attrs
+    def create(self,validated_data):
+        validated_data.pop('password2')
+        user = CustomUser.objects.create(
+            username=validated_data.get('username',''),
+            email=validated_data.get('email',''),
+            phone=validated_data.get('phone',''),
+            first_name=validated_data.get('first_name',''),
+            last_name=validated_data.get('last_name',''),
+            gender=validated_data.get('gender', False),
+            is_customer= validated_data.get('is_customer', True),
+            is_staff=validated_data.get('is_staff', False),
         )
-        customer_group = Group.objects.get(name='Customers')
-        user.groups.add(customer_group)
+        user.set_password(validated_data.get('password',''))
+        user.save()
+        try:
+            group,_ = Group.objects.get_or_create(name='Customers')
+            user.groups.add(group)
+        except Group.DoesNotExist:
+            group = None
         return user
 
-class SellerRegistrationSerializer(serializers.ModelSerializer):
-    store_name = serializers.CharField(max_length=255, required=False)
-    store_address = serializers.CharField(max_length=500, required=False)
-    seller_type = serializers.ChoiceField(choices=['Owner', 'Manager', 'Operator'], default='Owner')
+
+#Serializers for Seller Registration
+class SellerRegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True,
+                                     validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+    store_name = serializers.CharField(max_length=100,required=True,write_only=True)
+    store_address = serializers.CharField(max_length=250,required=True,write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'phone_number', 'password', 'store_name', 'store_address', 'seller_type']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['username', 'email', 'password', 'password2', 'phone',
+                  'first_name', 'last_name','store_name','store_address','gender']
+        extra_kwargs = {
+            'username': {'required': True},
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'email': {'required': True},
+            'phone': {'required': True},
+            'store_name': {'required': False,},
+            'store_address': {'required': False},
+            'gender': {'required': True},
+        }
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({'password': 'Passwords fields didnt match'})
+        return attrs
 
     def create(self, validated_data):
-        store_name = validated_data.pop('store_name', None)
-        store_address = validated_data.pop('store_address', None)
-        seller_type = validated_data.pop('seller_type', 'Owner')
-
-        user = CustomUser.objects.create_user(
-            username=validated_data.get('username'),
-            email=validated_data.get('email'),
-            phone_number=validated_data.get('phone_number'),
-            password=validated_data['password'],
-            is_customer=False
+        validated_data.pop('password2')
+        user = CustomUser.objects.create(
+            username=validated_data.get('username',''),
+            email=validated_data.get('email',''),
+            phone=validated_data.get('phone',''),
+            first_name=validated_data.get('first_name',''),
+            last_name=validated_data.get('last_name',''),
+            gender=validated_data.get('gender', False),
+            is_customer= validated_data.get('is_customer', False),
+            is_staff = validated_data.get('is_staff', False),
         )
-
-        # Assign group based on seller_type
-        group_name = f'Seller {seller_type}s'
-        seller_group = Group.objects.get(name=group_name)
-        user.groups.add(seller_group)
-
-        # If Seller Owner, create a Store
-        if seller_type == 'Owner' and store_name and store_address:
-            from src.config.store_app.models import Store  # Import here to avoid circular imports
-            Store.objects.create(
-                owner=user,
-                name=store_name,
-                address=store_address
-            )
-        # Managers/Operators will be linked to stores later via StoreEmployee
-
+        user.set_password(validated_data.get('password'))
+        Store.objects.create(
+            owner=user,
+            name=validated_data.get('store_name'),
+            address=validated_data.get('store_address'),
+        )
+        user.save()
+        # group = Group.objects.get(name='SellerOwners')
+        store = Store.objects.get(owner=user)
+        self.store = store
+        try:
+            group , _ = Group.objects.get_or_create(name='SellerOwners')
+            user.groups.add(group)
+        except Group.DoesNotExist:
+            group = None
         return user
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        store = getattr(self,'store', None)
+        if store:
+            rep['store'] = {
+                'id':store.id,
+                'name':store.name,
+                'address':store.address,
+            }
+        return rep
+
+
 
 class LoginSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=68, min_length=6, write_only=True, )
-    username = serializers.CharField(max_length=25, min_length=6)
+    password = serializers.CharField(max_length=68, write_only=True, )
+    username = serializers.CharField(max_length=25,)
     token = serializers.SerializerMethodField()
+    user_type = serializers.SerializerMethodField()
+    redirect_url = serializers.SerializerMethodField()
     def get_token(self,obj):
         user = CustomUser.objects.get(username=obj['username'])
         return {
-            'refresh':user.tokens()['refresh'],
-            'access':user.tokens()['access'],
+            'refresh':str(RefreshToken.for_user(user)),
+            'access':str(RefreshToken.for_user(user).access_token),
         }
+    def get_user_type(self,obj):
+        user = CustomUser.objects.get(username=obj['username'])
+        return 'customer' if user.is_customer else 'seller'
+    def get_redirect_url(self,obj):
+        type = self.get_user_type(obj)
+        if type == 'customer':
+            return '/customer/dashboard/'
+        else:
+            return '/seller/dashboard/'
+
     class Meta:
         model = CustomUser
-        fields = ('username','password','token')
+        fields = ('username','password','token','user_type','redirect_url')
     def validate(self, attrs):
         username = attrs.get('username', '')
         password = attrs.get('password', '')
@@ -87,7 +157,8 @@ class LoginSerializer(serializers.ModelSerializer):
         return {
             'email': user.email,
             'username': user.username,
-            'tokens': user.tokens
+            'token': user.token,
+            'user_type':user.is_customer,
         }
 
 class LogOutSerializer(serializers.ModelSerializer):
@@ -103,3 +174,28 @@ class LogOutSerializer(serializers.ModelSerializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             self.fail('bad_token')
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, validators=[validate_password])
+    new_password2 = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password2']:
+            raise serializers.ValidationError({"new_password": "Password fields didn't match."})
+        return attrs
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    groups = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name'
+    )
+
+    class Meta:
+        model = CustomUser
+        fields = ('id', 'username', 'email', 'phone', 'first_name', 'last_name',
+                  'gender', 'is_customer', 'profile_img', 'groups')
+        read_only_fields = ('id', 'groups')
