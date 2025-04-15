@@ -15,6 +15,7 @@ from decouple import config
 import os
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
+import logging.config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,16 +35,17 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
-    'users_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users_app',
     'corsheaders',
     'rest_framework',
     'django_filters',
+    'django_redis',
     'core_app',
     'rest_framework_simplejwt',
     'store_app',
@@ -53,7 +55,11 @@ INSTALLED_APPS = [
 ]
 AUTH_USER_MODEL = "users_app.CustomUser"
 
-
+#Custom Authentications Back-End
+AUTHENTICATION_BACKENDS = [
+    'core_app.authentication.EmailBackend',  # Add custom backend
+    'django.contrib.auth.backends.ModelBackend',  # Keep default for admin
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -62,9 +68,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'log_request_id.middleware.RequestIDMiddleware',
+
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'config.urls'
@@ -182,3 +189,142 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
 }
 
+
+#Redis-CLI
+#django.core.cache.backends.redis.RedisCache
+#"django_redis.cache.RedisCache",
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+# Email Settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# django-otp
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Update with your Redis URL
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'  # Set to your timezone
+
+# Celery Beat Schedule - for recurring tasks
+CELERY_BEAT_SCHEDULE = {
+    'clear-expired-otp-codes': {
+        'task': 'users_app.tasks.clear_expired_otp_codes',
+        'schedule': 3600.0,  # Run every hour (in seconds)
+    },
+}
+# Automatic retry for failed tasks
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+
+# Task execution settings
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_TASK_SOFT_TIME_LIMIT = 15 * 60  # 15 minutes
+
+# Rate limiting
+CELERY_TASK_ANNOTATIONS = {
+    'users_app.tasks.clear_expired_otp_codes': {
+        'rate_limit': '1/h'  # Limit to once per hour
+    }
+}
+
+# Configure Celery logging
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'celery_file': {
+#             'level': 'INFO',
+#             'class': 'logging.FileHandler',
+#             'filename': '/path/to/your/logs/celery.log',  # Update path
+#             'formatter': 'verbose',
+#         },
+#         'console': {
+#             'level': 'INFO',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'verbose',
+#         },
+#     },
+#     'loggers': {
+#         'users_app.tasks': {
+#             'handlers': ['celery_file', 'console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#         'celery': {
+#             'handlers': ['celery_file', 'console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#     },
+# }
+
+# Logging
+LOGGING_CONFIG = None # This line is important to disable the default django logging configuration
+LOGGING = {
+    "version": 1,
+    "formatters": {
+        "verbose": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s %(levelname)-8s %(asctime)s %(request_id)s  %(process)s --- "
+            "%(lineno)-8s [%(name)s] %(funcName)-24s : %(message)s",
+            "log_colors": {
+                "DEBUG": "blue",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
+        },
+        "aws": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "filters": {
+        "request_id": {"()": "log_request_id.filters.RequestIDFilter"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+            "filters": ["request_id"],
+        },
+    },
+    "loggers": {
+        # Default logger for any logger name
+        "": {
+            "level": "INFO",
+            "handlers": ["console", ],
+            "propagate": False,
+        },
+        # Logger for django server logs with django.server logger name
+        "django.server": {
+            "level": "DEBUG",
+            "handlers": ["console", ],
+            "propagate": False,
+        },
+        # Logger for 3rd party library to restrict unnecessary log statments by the library
+        "azure": {"level": "ERROR", "handlers": ["console"], "propogate": False},
+    },
+}
+logging.config.dictConfig(LOGGING) # Finally replace our config in python logging

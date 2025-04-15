@@ -1,6 +1,10 @@
+import datetime
+
 from rest_framework import serializers
 from .models import CustomUser
 from store_app.models import Store
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import Group
 from django.contrib.auth import login,logout,authenticate
@@ -121,45 +125,131 @@ class SellerRegisterSerializer(serializers.ModelSerializer):
 
 
 
-class LoginSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=68, write_only=True, )
-    username = serializers.CharField(max_length=25,)
-    token = serializers.SerializerMethodField()
-    user_type = serializers.SerializerMethodField()
-    redirect_url = serializers.SerializerMethodField()
-    def get_token(self,obj):
-        user = CustomUser.objects.get(username=obj['username'])
-        return {
-            'refresh':str(RefreshToken.for_user(user)),
-            'access':str(RefreshToken.for_user(user).access_token),
-        }
-    def get_user_type(self,obj):
-        user = CustomUser.objects.get(username=obj['username'])
-        return 'customer' if user.is_customer else 'seller'
-    def get_redirect_url(self,obj):
-        type = self.get_user_type(obj)
-        if type == 'customer':
-            return '/customer/dashboard/'
-        else:
-            return '/seller/dashboard/'
+# class LoginSerializer(serializers.ModelSerializer):
+#     email = serializers.EmailField(write_only=True,required=True)
+#     password = serializers.CharField(max_length=68, write_only=True, )
+#     username = serializers.CharField(max_length=25,)
+#     token = serializers.SerializerMethodField()
+#     user_type = serializers.SerializerMethodField()
+#     redirect_url = serializers.SerializerMethodField()
+#     def get_token(self,obj):
+#         user = CustomUser.objects.get(username=obj['username'])
+#         return {
+#             'refresh':str(RefreshToken.for_user(user)),
+#             'access':str(RefreshToken.for_user(user).access_token),
+#         }
+#     def get_user_type(self,obj):
+#         user = CustomUser.objects.get(username=obj['username'])
+#         return 'customer' if user.is_customer else 'seller'
+#     def get_redirect_url(self,obj):
+#         type = self.get_user_type(obj)
+#         if type == 'customer':
+#             return '/customer/dashboard/'
+#         else:
+#             return '/seller/dashboard/'
+#
+#     class Meta:
+#         model = CustomUser
+#         fields = ('email','username','password','token','user_type','redirect_url')
+#     def validate(self, attrs):
+#         username = attrs.get('username', '')
+#         password = attrs.get('password', '')
+#         user = authenticate(username=username, password=password)
+#         if not user:
+#             raise AuthenticationFailed('Invalid Credentials,Try Again')
+#         if not user.is_active:
+#             raise AuthenticationFailed('Your account is inactive,Contact Admin')
+#         return {
+#             'email': user.email,
+#             'username': user.username,
+#             'token': user.token,
+#             'user_type':user.is_customer,
+#         }
 
-    class Meta:
-        model = CustomUser
-        fields = ('username','password','token','user_type','redirect_url')
+class LoginOTPRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(
+        style={'input_type': 'password'},
+        write_only=True
+    )
+
     def validate(self, attrs):
-        username = attrs.get('username', '')
-        password = attrs.get('password', '')
-        user = authenticate(username=username, password=password)
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        # Use authenticate with email
+        user = authenticate(request=self.context.get('request'), email=email, password=password)
         if not user:
-            raise AuthenticationFailed('Invalid Credentials,Try Again')
+            raise serializers.ValidationError(_('Invalid credentials, try again'))
         if not user.is_active:
-            raise AuthenticationFailed('Your account is inactive,Contact Admin')
+            raise serializers.ValidationError(_('Account disabled, contact admin'))
+
+        # Store user for view
+        self.user = user
         return {
             'email': user.email,
             'username': user.username,
-            'token': user.token,
-            'user_type':user.is_customer,
+            'token': user.token(),  # Assuming token() method works
+            'user_type': user.is_customer,
         }
+
+class VerifyOTPSerializer(serializers.Serializer):
+    """Serializer for OTP verification"""
+    email = serializers.EmailField()
+    otp = serializers.CharField(
+        min_length=6,
+        max_length=6,
+        write_only=True
+    )
+    token = serializers.SerializerMethodField()
+    user_type = serializers.SerializerMethodField()
+    redirect_url = serializers.SerializerMethodField()
+
+    def get_token(self, obj):
+        """Generate JWT tokens for the user"""
+        user = CustomUser.objects.get(email=obj['email'])
+        refresh = RefreshToken.for_user(user)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
+
+    def get_user_type(self, obj):
+        """Return the user type (customer or seller)"""
+        user = CustomUser.objects.get(email=obj['email'])
+        return 'customer' if user.is_customer else 'seller'
+
+    def get_redirect_url(self, obj):
+        """Return the appropriate redirect URL based on user type"""
+        user = CustomUser.objects.get(email=obj['email'])
+        if user.is_customer:
+            return '/customer/dashboard/'  # Customer dashboard URL
+        else:
+            return '/seller/dashboard/'  # Seller dashboard URL
+
+    def validate(self, attrs):
+        """Validate the OTP"""
+        email = attrs.get('email')
+        otp = attrs.get('otp')
+
+        try:
+            user = CustomUser.objects.get(email=email)
+
+            # Check if OTP is valid and not expired
+            if not user.otp or user.otp != otp:
+                raise serializers.ValidationError(_('Invalid verification code'))
+
+            if not user.otp_expiry_time or user.otp_expiry_time < timezone.now():
+                raise serializers.ValidationError(_('Verification code has expired'))
+
+            # All validations passed, return the data
+            return {
+                'email': email,
+                'otp_valid': True
+            }
+
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError(_('No user found with this email'))
 
 class LogOutSerializer(serializers.ModelSerializer):
     refresh = serializers.CharField()

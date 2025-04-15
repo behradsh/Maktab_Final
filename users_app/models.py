@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser,Group,Permission
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from rest_framework_simplejwt.tokens import RefreshToken
+from config import settings
 
 PHONE_VALIDATOR = RegexValidator(
     regex=r'^(\+98|0)?9\d{9}$',
@@ -39,6 +40,17 @@ class CustomUser(AbstractUser):
         blank=True,
         related_name='custom_user_set',
         related_query_name='custom_user',
+    )
+    otp = models.CharField(
+        _("OTP"),
+        max_length=6,
+        blank=True,
+        null=True,
+    )
+    otp_expiry_time = models.DateTimeField(
+        _("OTP Expiry"),
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
