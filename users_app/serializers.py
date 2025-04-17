@@ -289,3 +289,57 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'phone', 'first_name', 'last_name',
                   'gender', 'is_customer', 'profile_img', 'groups')
         read_only_fields = ('id', 'groups')
+
+class PhoneLoginRequestSerializer(serializers.Serializer):
+    phone = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        phone = attrs.get('phone')
+        try:
+            user = CustomUser.objects.get(phone=phone)
+            if not user.is_active:
+                raise serializers.ValidationError(_('Account disabled, contact admin'))
+            self.user = user
+            return {'phone': phone}
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError(_('No user found with this phone number'))
+
+class PhoneVerifyOTPSerializer(serializers.Serializer):
+    phone = serializers.CharField()
+    otp = serializers.CharField(min_length=6, max_length=6, write_only=True)
+    token = serializers.SerializerMethodField()
+    user_type = serializers.SerializerMethodField()
+    redirect_url = serializers.SerializerMethodField()
+
+    def get_token(self, obj):
+        user = CustomUser.objects.get(phone=obj['phone'])
+        return user.token()
+
+    def get_user_type(self, obj):
+        user = CustomUser.objects.get(phone=obj['phone'])
+        return 'customer' if user.is_customer else 'seller'
+
+    def get_redirect_url(self, obj):
+        user = CustomUser.objects.get(phone=obj['phone'])
+        return '/customer/dashboard/' if user.is_customer else '/seller/dashboard/'
+
+    def validate(self, attrs):
+        phone = attrs.get('phone')
+        otp = attrs.get('otp')
+
+        try:
+            user = CustomUser.objects.get(phone=phone)
+
+            if not user.otp or user.otp != otp:
+                raise serializers.ValidationError(_('Invalid verification code'))
+
+            if not user.otp_expiry_time or user.otp_expiry_time < timezone.now():
+                raise serializers.ValidationError(_('Verification code has expired'))
+
+            return {
+                'phone': phone,
+                'otp_valid': True,
+            }
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError(_('No user found with this phone number'))
+

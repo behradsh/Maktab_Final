@@ -5,6 +5,7 @@ from .models import CustomUser
 import logging
 from config import settings
 from django.core.mail import send_mail
+from kavenegar import *
 
 
 logger = logging.getLogger(__name__)
@@ -36,26 +37,40 @@ def clear_expired_otp_codes():
     This function runs as a scheduled Celery task
     """
     try:
-        with transaction.atomic():
-            # Get profiles with non-null OTP and expired time
-            expired_profiles = CustomUser.objects.filter(
-                otp__isnull=False,
-                otp_expiry_time__lt=timezone.now()
-            )
+        # Get profiles with non-null OTP and expired time
+        expired_profiles = CustomUser.objects.filter(
+            otp__isnull=False,
+            otp_expiry_time__lt=timezone.now()
+        )
 
-            # Log the number of profiles to clear
-            count = expired_profiles.count()
+        # Log the number of profiles to clear
+        count = expired_profiles.count()
 
-            # Reset OTP fields
-            expired_profiles.update(
-                otp=None,
-                otp_expiry_time=None
-            )
-
-            logger.info(f"Successfully cleared {count} expired OTP codes")
-            return f"Cleared {count} expired OTP codes"
+        # Reset OTP fields
+        expired_profiles.update(
+            otp=None,
+            otp_expiry_time=None
+        )
+        logger.info(f"Successfully cleared {count} expired OTP codes")
+        return f"Cleared {count} expired OTP codes"
 
     except Exception as e:
         logger.error(f"Error clearing expired OTP codes: {str(e)}")
         # Re-raise the exception for Celery's retry mechanism
         raise
+
+
+@shared_task
+def send_sms_otp(phone, verification_code):
+    try:
+        api = KavenegarAPI('737A32324148544D6443506B356F37677670594D495A3076516F6E72793243324F45467442727A706D48513D')
+        params = {'sender': '2000660110', 'receptor': f'{phone}', 'message': f'{verification_code}کداعتبارسنجی تلفن همراه شما:'}
+        response = api.sms_send(params)
+        print(response)
+        print(f"SMS sent to {params['receptor']}: {params['message']}")
+        return response
+    except Exception as e:
+        print(f"Failed to send SMS to {phone}: {str(e)}")
+        return False
+
+

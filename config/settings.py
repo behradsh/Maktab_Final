@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_spectacular',
     'users_app',
     'corsheaders',
     'rest_framework',
@@ -52,12 +53,14 @@ INSTALLED_APPS = [
     'products_app',
     'orders_app',
     'rest_framework_simplejwt.token_blacklist',
+    'kavenegar',
 ]
 AUTH_USER_MODEL = "users_app.CustomUser"
 
 #Custom Authentications Back-End
 AUTHENTICATION_BACKENDS = [
     'core_app.authentication.EmailBackend',  # Add custom backend
+    'core_app.authentication.PhoneBackend',  # Add custom backend
     'django.contrib.auth.backends.ModelBackend',  # Keep default for admin
 ]
 MIDDLEWARE = [
@@ -179,7 +182,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
@@ -187,6 +191,14 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
     'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
     'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
+}
+SPECTACULAR_SETTINGS = {
+    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'TITLE': 'Django Ecommerce API',
+    'DESCRIPTION': 'this is some Description',
+    'VERSION': '1.0.0',
 }
 
 
@@ -240,43 +252,6 @@ CELERY_TASK_ANNOTATIONS = {
         'rate_limit': '1/h'  # Limit to once per hour
     }
 }
-
-# Configure Celery logging
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'verbose': {
-#             'format': '{levelname} {asctime} {module} {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'celery_file': {
-#             'level': 'INFO',
-#             'class': 'logging.FileHandler',
-#             'filename': '/path/to/your/logs/celery.log',  # Update path
-#             'formatter': 'verbose',
-#         },
-#         'console': {
-#             'level': 'INFO',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'verbose',
-#         },
-#     },
-#     'loggers': {
-#         'users_app.tasks': {
-#             'handlers': ['celery_file', 'console'],
-#             'level': 'INFO',
-#             'propagate': True,
-#         },
-#         'celery': {
-#             'handlers': ['celery_file', 'console'],
-#             'level': 'INFO',
-#             'propagate': True,
-#         },
-#     },
-# }
 
 # Logging
 LOGGING_CONFIG = None # This line is important to disable the default django logging configuration

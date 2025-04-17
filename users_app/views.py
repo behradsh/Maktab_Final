@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from datetime import timedelta
 import random
-from rest_framework import (generics,status,views,permissions)
+from rest_framework import (generics, status, views, permissions)
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -16,12 +16,13 @@ from .serializers import (UserRegisterSerializer,
                           VerifyOTPSerializer,
                           LogOutSerializer,
                           UserDetailSerializer,
-                          ChangePasswordSerializer,)
-from rest_framework.permissions import IsAuthenticated,AllowAny
+                          ChangePasswordSerializer,
+                          PhoneLoginRequestSerializer,
+                          PhoneVerifyOTPSerializer, )
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.utils.translation import gettext_lazy as _
-from .tasks import send_otp_email
-
+from .tasks import (send_otp_email,send_sms_otp)
 
 
 # Create your views here.
@@ -29,6 +30,7 @@ class CustomerRegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.filter(is_customer=True)
     permission_classes = (AllowAny,)
     serializer_class = UserRegisterSerializer
+
 
 class SellerRegisterView(generics.CreateAPIView):
     serializer_class = SellerRegisterSerializer
@@ -39,26 +41,30 @@ class SellerRegisterView(generics.CreateAPIView):
 class UserDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = UserDetailSerializer
     permission_classes = (IsAuthenticated,)
+
     def get_object(self):
         return self.request.user
+
 
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
     permission_classes = (IsAuthenticated,)
+
     def get_object(self):
         return self.request.user
+
     def update(self, request, *args, **kwargs):
         user = self.get_object()
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            #check old password
+            # check old password
             if not user.check_password(serializer.validated_data['old_password']):
-                return Response({"old password":["Wrong password"]},
+                return Response({"old password": ["Wrong password"]},
                                 status=status.HTTP_400_BAD_REQUEST)
-            #Set new password
+            # Set new password
             user.set_password(serializer.validated_data['new_password'])
             user.save()
-            return Response({"message":["Your password has been Changed"]},)
+            return Response({"message": ["Your password has been Changed"]}, )
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -79,24 +85,28 @@ class ChangePasswordView(generics.UpdateAPIView):
 class LogOutAPIView(APIView):
     serializer_class = LogOutSerializer
     permission_classes = [IsAuthenticated]
-    def post(self,request):
+
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         # serializer.is_valid(raise_exception=True)
         # serializer.save()
         logout(request)
-        return Response("Successfully LoggedOut",status=status.HTTP_204_NO_CONTENT)
+        return Response("Successfully LoggedOut", status=status.HTTP_204_NO_CONTENT)
+
 
 @login_required(login_url="/login/")
 def customer_dashboard(request):
     return HttpResponse(_("Customer Dashboard"))
 
+
 @login_required(login_url="/login/")
 def seller_dashboard(request):
     return HttpResponse(_("Seller Dashboard"))
 
-#Implementing the OTP for sending mail
+
+# Implementing the OTP for sending mail
 def generate_random_digits(n=6):
-    return "".join(map(str,random.sample(range(0,10), n)))
+    return "".join(map(str, random.sample(range(0, 10), n)))
 
 
 class LoginOTPView(APIView):
@@ -114,20 +124,20 @@ class LoginOTPView(APIView):
         email = serializer.validated_data['email']
 
         try:
-                # Generate a 6-digit code and set the expiry time to 1 hour from now
-                verification_code = generate_random_digits()
-                user.otp = verification_code
-                user.otp_expiry_time = timezone.now() + timedelta(hours=1)
-                user.save()
+            # Generate a 6-digit code and set the expiry time to 1 hour from now
+            verification_code = generate_random_digits()
+            user.otp = verification_code
+            user.otp_expiry_time = timezone.now() + timedelta(hours=1)
+            user.save()
 
-                # Send the code via email
-                send_otp_email.delay(email, verification_code)
+            # Send the code via email
+            send_otp_email.delay(email, verification_code)
 
-                return Response({
-                    'detail': 'Verification code sent successfully.',
-                    'email': email,
-                    'redirect_url': '/api/login/verify/'  # Instruct frontend to redirect
-                }, status=status.HTTP_200_OK)
+            return Response({
+                'detail': 'Verification code sent successfully.',
+                'email': email,
+                'redirect_url': '/api/login/verify/'  # Instruct frontend to redirect
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({
@@ -171,6 +181,7 @@ class VerifyOTPView(APIView):
                 'detail': f'Verification failed: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 class ResendOTPView(APIView):
     permission_classes = [AllowAny]
 
@@ -191,3 +202,62 @@ class ResendOTPView(APIView):
             return Response({
                 'detail': 'User not found'
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+class PhoneLoginView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = PhoneLoginRequestSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.user
+        phone = serializer.validated_data['phone']
+
+        try:
+            verification_code = generate_random_digits()
+            user.otp = verification_code
+            user.otp_expiry_time = timezone.now() + timedelta(minutes=10)
+            user.save()
+
+            send_sms_otp.delay(phone, verification_code)
+
+            return Response({
+                'detail': 'SMS sent to phone.',
+                'phone': phone,
+                'redirect_url': 'login/phone/verify/'
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                'detail': f'Failed to send OTP: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PhoneVerifyOTPView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = PhoneVerifyOTPSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone = serializer.validated_data['phone']
+
+        try:
+            user = CustomUser.objects.get(phone=phone)
+            user.otp = None
+            user.otp_expiry_time = None
+            user.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except CustomUser.DoesNotExist:
+            return Response({
+                'detail': 'User not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'detail': f'Verification failed: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

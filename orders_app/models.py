@@ -38,6 +38,6 @@ class OrderItems(models.Model):
                                    help_text=_("The discount applied to the order"))
     class Meta:
         verbose_name_plural = _("Order Items")
-    @property
-    def subtotal(self):
-        return self.price * self.quantity
+    @classmethod
+    def subtotal(cls):
+        return cls.price * cls.quantity

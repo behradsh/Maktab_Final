@@ -12,3 +12,12 @@ class EmailBackend(ModelBackend):
                 return user
         except CustomUser.DoesNotExist:
             return None
+
+class PhoneBackend(ModelBackend):
+    def authenticate(self, request, phone=None, password=None, **kwargs):
+        try:
+            user = CustomUser.objects.get(phone__iexact=phone)
+            if user.check_password(password):
+                return user
+        except CustomUser.DoesNotExist:
+            return None
