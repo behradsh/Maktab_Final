@@ -2,13 +2,13 @@ from django.shortcuts import render
 from django.utils import timezone
 from datetime import timedelta
 import random
-from rest_framework import (generics, status, views, permissions)
+from rest_framework import (generics, status, views, permissions, viewsets)
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import CustomUser
+from .models import CustomUser, Address
 from rest_framework.views import APIView
 from .serializers import (UserRegisterSerializer,
                           SellerRegisterSerializer,
@@ -18,11 +18,14 @@ from .serializers import (UserRegisterSerializer,
                           UserDetailSerializer,
                           ChangePasswordSerializer,
                           PhoneLoginRequestSerializer,
-                          PhoneVerifyOTPSerializer, )
+                          PhoneVerifyOTPSerializer,
+                          AddressSerializer,
+                          CustomerProfileSerializer)
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.utils.translation import gettext_lazy as _
-from .tasks import (send_otp_email,send_sms_otp)
+from .tasks import (send_otp_email, send_sms_otp)
 
 
 # Create your views here.
@@ -37,25 +40,12 @@ class SellerRegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.filter(is_customer=False)
     permission_classes = (AllowAny,)
 
-
-class UserDetailView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserDetailSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_object(self):
-        return self.request.user
-
-
-class ChangePasswordView(generics.UpdateAPIView):
-    serializer_class = ChangePasswordSerializer
-    permission_classes = (IsAuthenticated,)
-
     def get_object(self):
         return self.request.user
 
     def update(self, request, *args, **kwargs):
         user = self.get_object()
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             # check old password
             if not user.check_password(serializer.validated_data['old_password']):
@@ -261,3 +251,66 @@ class PhoneVerifyOTPView(APIView):
             return Response({
                 'detail': f'Verification failed: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CustomerProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = CustomerProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+    model = CustomUser
+    permission_classes = (IsAuthenticated,)
+
+    def update(self, request, *args, **kwargs):
+        user = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            if not user.check_password(serializer.validated_data['old_password']):
+                return Response({'old_password': 'Wrong password.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({'status': 'password set'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerAddressView(generics.ListCreateAPIView):
+    serializer_class = AddressSerializer
+    model = Address
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Address.objects.filter(customer=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(customer=self.request.user)
+
+
+class CustomerAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Address.objects.filter(customer=self.request.user)
+
+    # Optional: Add this method to ensure users can only modify their own addresses
+    def check_object_permissions(self, request, obj):
+        if obj.customer != request.user:
+            self.permission_denied(request, message="You don't have permission to access this address.")
+        return super().check_object_permissions(request, obj)
+
+    def perform_update(self, serializer):
+        # If this address is being set as default, unset any existing default
+        if serializer.validated_data.get('is_default', False):
+            Address.objects.filter(
+                customer=self.request.user,
+                is_default=True
+            ).exclude(pk=self.get_object().pk).update(is_default=False)
+        serializer.save()
+    def perform_destroy(self, instance):
+        instance.delete()
+        return "Address deleted."

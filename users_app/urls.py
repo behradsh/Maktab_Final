@@ -3,14 +3,20 @@ from .views import (LoginOTPView,
                     VerifyOTPView,
                     LogOutAPIView,
                     ChangePasswordView,
-                    UserDetailView,
+                    CustomerProfileView,
                     CustomerRegisterView,
                     SellerRegisterView,
                     customer_dashboard,
                     seller_dashboard,
                     ResendOTPView,
                     PhoneLoginView,
-                    PhoneVerifyOTPView)
+                    PhoneVerifyOTPView,
+                    CustomerAddressView,
+                    CustomerAddressDetailView)
+from orders_app.views import (CustomerOrderHistoryView)
+from products_app.views import (CommentCreateView,UserCommentsListView)
+
+
 urlpatterns = [
     path('register/customer/', CustomerRegisterView.as_view(), name='customer_register'),
     path('register/seller/', SellerRegisterView.as_view(), name='seller_register'),
@@ -20,6 +26,11 @@ urlpatterns = [
     path('login/phone/', PhoneLoginView.as_view(), name='phone_login'),
     path('login/phone/verify/', PhoneVerifyOTPView.as_view(), name='phone_verify_otp'),
     path('logout/', LogOutAPIView.as_view(), name='logout'),
-    path('profile/', UserDetailView.as_view(), name='user_profile'),
-    path('profile/change_password/', ChangePasswordView.as_view(), name='change_password'),
+    path('customer/dashboard/profile/', CustomerProfileView.as_view(), name='user_profile'),
+    path('customer/dashboard/profile/change_password/', ChangePasswordView.as_view(), name='change_password'),
+    path('customer/dashboard/orders/', CustomerOrderHistoryView.as_view(), name='customer_order_history'),
+    path('customer/dashboard/address/', CustomerAddressView.as_view(), name='customer_address'),
+    path('customer/dashboard/address/<int:pk>/', CustomerAddressDetailView.as_view(), name='customer_address_update'),
+    path('customer/dashboard/comments/', UserCommentsListView.as_view(), name='customer_comments'),
+    path('customer/dashboard/comments/create/', CommentCreateView.as_view(), name='customer_comments_create'),
 ]

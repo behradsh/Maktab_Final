@@ -5,6 +5,7 @@ from users_app.models import CustomUser
 # Create your models here.
 class Store(models.Model):
     name = models.CharField(_("Name of Store"), max_length=80,blank=False, null=False)
+    city = models.CharField(_("Store City"), max_length=30, blank=False, null=False,default="tehran")
     address = models.CharField(_("Address of Store"), max_length=150,blank=False, null=False)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     owner = models.OneToOneField(CustomUser, verbose_name=_("Owner"), on_delete=models.PROTECT)

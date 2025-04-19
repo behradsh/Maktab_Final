@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-
-from .models import (Category,Product)
-from .serializers import (CategorySerializer,ProductSerializer)
+from rest_framework import generics,permissions
+from .models import (Category,Product,Comment)
+from .serializers import (CategorySerializer,ProductSerializer,CommentSerializer)
 from rest_framework import viewsets
 from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
@@ -22,3 +22,18 @@ class ProductView(APIView):
     class Meta:
         model = Product
         fields = '__all__'
+
+class CommentCreateView(generics.CreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class UserCommentsListView(generics.ListAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Comment.objects.filter(user=self.request.user)
+

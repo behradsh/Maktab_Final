@@ -50,4 +50,3 @@ class OrderItemsAdmin(admin.ModelAdmin):
     list_filter = ('order__status',)
     search_fields = ('order__id', 'product__name')
     raw_id_fields = ('order', 'product')  # Useful if you have many orders/products
-    readonly_fields = ('price', 'discount')

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser,Address
 # Register your models here.
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
@@ -11,3 +11,13 @@ class CustomUserAdmin(admin.ModelAdmin):
         ('other info', {'fields': ("is_staff", "is_active", "groups", "user_permissions",)}),
     )
     search_fields = ('first_name__startswith', 'last_name__startswith', 'phone__startswith',)
+
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('customer', 'address_line', 'city', 'province', 'country','postal_code','is_default')
+    list_filter = ('customer', 'city', 'province',)
+    fieldsets = (
+        ('Standard info', {'fields': ("customer", "address_line", "city", "province", "country", "postal_code",)}),
+        ('other info', {'fields': ("is_default", )}),
+    )
+    search_fields = ('customer__startswith', 'province__startswith', 'city__startswith',)

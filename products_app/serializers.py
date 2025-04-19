@@ -15,6 +15,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name', read_only=True)
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['id', 'product_name', 'rating', 'description', 'status', 'created_at']

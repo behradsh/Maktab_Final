@@ -21,7 +21,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("user", "product", "rating", "status", "description_preview")
+    list_display = ("user", "product", "status", "created_at", "description_preview")
     list_filter = ("status", "rating", "product")
     search_fields = ("user__username", "product__name", "description")
     autocomplete_fields = ("user", "product", "reply_comment")

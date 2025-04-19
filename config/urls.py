@@ -21,7 +21,7 @@ from django.conf.urls.i18n import i18n_patterns
 from products_app.views import (CategoryView,ProductView)
 from drf_spectacular.views import (SpectacularAPIView,SpectacularSwaggerView,SpectacularRedocView)
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView,)
-# router = DefaultRouter()
+router = DefaultRouter()
 # router.register(r"category",CategoryView)
 # router.register(r"product",ProductView)
 
