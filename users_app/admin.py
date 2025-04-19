@@ -21,3 +21,4 @@ class AddressAdmin(admin.ModelAdmin):
         ('other info', {'fields': ("is_default", )}),
     )
     search_fields = ('customer__startswith', 'province__startswith', 'city__startswith',)
+

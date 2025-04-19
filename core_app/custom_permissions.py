@@ -1,6 +1,5 @@
 from rest_framework import permissions
 
-
 class IsStaff(permissions.BasePermission):
     "Allow Access to Staff Only"
 
@@ -22,11 +21,44 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     # def has_object_permission(self, request, view, obj):
 
 
-class IsAuthorOrNot(permissions.BasePermission):
-    "Allow Access to Author Only"
+class IsCustomerOrNot(permissions.BasePermission):
+    "Allow Access to Customers Only"
 
     def has_permission(self, request, view):
-        user = request.user
-        role = request.user.role
-        is_true = (role == "author")
-        return is_true
+        flag = request.user.is_customer
+        if flag:
+            return flag
+        return False
+
+class IsSellerOrNot(permissions.BasePermission):
+    "Allow Access to Sellers Only"
+    def has_permission(self, request, view):
+        flag = request.user.is_customer
+        if not flag:
+            return True
+        return False
+
+class IsSellerOwner(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name="SellerOwners").exists()
+
+class IsCustomer(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name="Customers").exists()
+
+
+class IsSellerManager(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name="SellerManagers").exists()
+
+class IsSellerOperator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name="SellerOperators").exists()
+
+class IsSelfOrAdmin(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj == request.user or request.user.is_staff
+
+class IsStoreOwnerOrManager(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name__in=["SellerOwners", "SellerManagers"]).exists()
