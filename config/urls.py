@@ -18,10 +18,10 @@ from django.contrib import admin
 from django.urls import path,include
 from rest_framework.routers import DefaultRouter
 from django.conf.urls.i18n import i18n_patterns
-from products_app.views import (CategoryView,ProductView)
+# from products_app.views import (CategoryView,ProductView)
 from drf_spectacular.views import (SpectacularAPIView,SpectacularSwaggerView,SpectacularRedocView)
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView,)
-router = DefaultRouter()
+# router = DefaultRouter()
 # router.register(r"category",CategoryView)
 # router.register(r"product",ProductView)
 
@@ -36,4 +36,6 @@ urlpatterns=i18n_patterns(
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('', include('core_app.urls')),
     path('', include('users_app.urls')),
+    path('', include('products_app.urls')),
+    path('', include('store_app.urls')),
 )

@@ -1,4 +1,5 @@
-from django.urls import path,include
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import (LoginOTPView,
                     VerifyOTPView,
                     LogOutAPIView,
@@ -6,15 +7,32 @@ from .views import (LoginOTPView,
                     CustomerProfileView,
                     CustomerRegisterView,
                     SellerRegisterView,
-                    customer_dashboard,
-                    seller_dashboard,
                     ResendOTPView,
                     PhoneLoginView,
                     PhoneVerifyOTPView,
                     CustomerAddressView,
-                    CustomerAddressDetailView)
+                    CustomerAddressDetailView,
+    #CustomerPanelViewSet,
+SellerProfileView,
+SellerChangePasswordView,
+    )
 from orders_app.views import (CustomerOrderHistoryView)
 from products_app.views import (CommentCreateView,UserCommentsListView)
+from store_app.views import (SellerStoreRetrieveView,
+                             SellerStoreUpdateView,
+                             StoreEmployeeCreateView,
+                             StoreEmployeeListView,
+                             StoreEmployeeUpdateView,
+                             StoreEmployeeDeleteView)
+from products_app.views import (SellerProductListCreateView, SellerProductRetrieveUpdateDestroyView,
+    CategoryListCreateView,CategoryRetrieveUpdateDestroyView)
+
+
+router = DefaultRouter()
+# router.register(r'customer', CustomerPanelViewSet, basename='customer')
+# router.register(r'seller', SellerPanelViewSet, basename='seller')
+
+
 
 
 urlpatterns = [
@@ -33,4 +51,7 @@ urlpatterns = [
     path('customer/dashboard/address/<int:pk>/', CustomerAddressDetailView.as_view(), name='customer_address_update'),
     path('customer/dashboard/comments/', UserCommentsListView.as_view(), name='customer_comments'),
     path('customer/dashboard/comments/create/', CommentCreateView.as_view(), name='customer_comments_create'),
+    path('seller/dashboard/profile/', SellerProfileView.as_view(), name='seller_profile'),
+    path('seller/dashboard/profile/change_password/', SellerChangePasswordView.as_view(), name='change_password_seller'),
+    path('', include(router.urls)),
 ]

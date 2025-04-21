@@ -8,7 +8,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ('is_staff', 'is_customer', 'gender', 'groups')
     fieldsets = (
         ('Standard info', {'fields': ("username", "password", "first_name", "last_name", "phone", "email",)}),
-        ('other info', {'fields': ("is_staff", "is_active", "groups", "user_permissions",)}),
+        ('other info', {'fields': ("is_staff", "is_active","is_customer" ,"groups", "user_permissions",)}),
     )
     search_fields = ('first_name__startswith', 'last_name__startswith', 'phone__startswith',)
 

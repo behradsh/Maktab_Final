@@ -66,6 +66,7 @@ class SellerRegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True, required=True)
     store_name = serializers.CharField(max_length=100, required=True, write_only=True)
     store_address = serializers.CharField(max_length=250, required=True, write_only=True)
+    store_city = serializers.CharField(max_length=25, required=True, write_only=True)
 
     class Meta:
         model = CustomUser
@@ -365,3 +366,19 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'gender', 'profile_img']
+
+class SellerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'gender', 'profile_img']
+
+class SellerChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, validators=[validate_password])
+    new_password2 = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password2']:
+            raise serializers.ValidationError({"new_password": "Password fields didn't match."})
+        return attrs
+

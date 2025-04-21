@@ -53,7 +53,7 @@ class CustomUser(AbstractUser):
     )
     is_customer = models.BooleanField(_("customer status"),
                                       help_text=_("Designates whether the user is buyer or seller."),
-                                      blank=False, null=False)
+                                      blank=False, null=False,default=False)
     gender = models.BooleanField(_("gender status"),
                                  default=False,
                                  help_text=_("Designates whether the user is man(1) or woman(0)."),

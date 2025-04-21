@@ -18,22 +18,27 @@ class Orders(models.Model):
     status = models.CharField(_("Status"), choices=ORDER_STATUS_CHOICES, default="pending")
     discount = models.IntegerField(_("Discount")
                                    ,validators=[MinValueValidator(0),MaxValueValidator(100)]
-                                   ,help_text=_("The discount applied to the order"),)
+                                   ,help_text=_("The discount applied to the order"),null=True,blank=True)
     total_amount = models.DecimalField(_("Total Amount"), max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
+    store = models.ForeignKey(Store, on_delete=models.PROTECT, related_name='orders',null=True,blank=True)
 
     class Meta:
         verbose_name_plural = _("Orders")
     def __str__(self):
         return f"Order #{self.pk} by {self.customer.username}"
-    def save(self,*args,**kwargs):
-        Items = OrderItems.objects.filter(order=self)
-        sum_total = 0
-        for item in Items:
-            sum_total += item.price * item.quantity
-        self.total_amount += sum_total
-        super().save(*args, **kwargs)
+    # def save(self,*args,**kwargs):
+    #     if not self.discount:
+    #         self.discount=0
+    #     Items = OrderItems.objects.filter(order=self)
+    #     sum_total = 0
+    #     for item in Items:
+    #         if item.discount:
+    #             sum_total += item.price * item.quantity * (1/item.discount)
+    #         sum_total += item.price * item.quantity
+    #     self.total_amount += sum_total
+    #     super().save(*args, **kwargs)
 
 class OrderItemsManager(models.Manager):
     def create(self, **kwargs):
@@ -55,9 +60,14 @@ class OrderItems(models.Model):
     def save(self, *args, **kwargs):
         # If no price is set and product exists, use the product's price
         if self.product and (not self.price or self.price == 0):
-            self.price = self.product.price * self.quantity
             if not self.discount:
                 self.discount=0
+            if self.discount == 0:
+                self.price = self.product.price * self.quantity
+            else:
+                calculate_discount = ((float(self.product.price) * float(self.quantity))*float(self.discount))/100
+                self.price = (float(self.product.price) * float(self.quantity)) - calculate_discount
+            self.product.quantity -= self.quantity
         super().save(*args, **kwargs)
 
     class Meta:

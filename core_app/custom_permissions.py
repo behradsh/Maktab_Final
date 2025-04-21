@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+
 class IsStaff(permissions.BasePermission):
     "Allow Access to Staff Only"
 
@@ -55,6 +56,8 @@ class IsSellerOperator(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.groups.filter(name="SellerOperators").exists()
 
+
+
 class IsSelfOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj == request.user or request.user.is_staff
@@ -62,3 +65,10 @@ class IsSelfOrAdmin(permissions.BasePermission):
 class IsStoreOwnerOrManager(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.groups.filter(name__in=["SellerOwners", "SellerManagers"]).exists()
+
+
+class IsSellerOwnerOrEmployee(permissions.BasePermission):
+    def has_permission(self, request, view):
+        is_owner = request.user.groups.filter(name='SellerOwners').exists()
+        is_employee = hasattr(request.user, 'user_store')
+        return is_owner or is_employee
