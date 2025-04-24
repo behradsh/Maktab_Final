@@ -362,6 +362,13 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = ['id', 'address_line', 'city', 'province', 'postal_code', 'country', 'is_default']
 
+    def create(self, validated_data):
+        is_default = validated_data.get('is_default', False)
+        user = self.context['request'].user
+        if is_default:
+            Address.objects.filter(customer=user, is_default=True).update(is_default=False)
+        return Address.objects.create(**validated_data)
+
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser

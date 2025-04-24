@@ -13,14 +13,14 @@ from rest_framework.response import Response
 
 class CommentCreateView(generics.CreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticated,IsSellerOwner]
+    permission_classes = [permissions.IsAuthenticated,IsCustomer]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 class UserCommentsListView(generics.ListAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticated,IsSellerOwner]
+    permission_classes = [permissions.IsAuthenticated,IsCustomer]
 
     def get_queryset(self):
         return Comment.objects.filter(user=self.request.user)
@@ -37,7 +37,7 @@ class SellerProductListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user = self.request.user
         if user.groups.filter(name='SellerOperators').exists():
-            raise PermissionDenied("Operators cannot create products.")
+            raise Exception("Operators cannot create products.")
         store = Store.objects.get(owner=self.request.user)
         serializer.save(store=store)
 
@@ -52,7 +52,7 @@ class SellerProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
     def perform_update(self, serializer):
         user = self.request.user
         if user.groups.filter(name='SellerOperators').exists():
-            raise PermissionDenied("Operators cannot update products.")
+            raise Exception("Operators cannot update products.")
         serializer.save()
 
 
@@ -73,3 +73,22 @@ class CategoryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticated,IsSellerOwner]
+
+class ProductListHomeView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = []
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+class CategoryListHomeView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = []
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context

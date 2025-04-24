@@ -20,7 +20,8 @@ from rest_framework.routers import DefaultRouter
 from django.conf.urls.i18n import i18n_patterns
 # from products_app.views import (CategoryView,ProductView)
 from drf_spectacular.views import (SpectacularAPIView,SpectacularSwaggerView,SpectacularRedocView)
-from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView,)
+from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 # router = DefaultRouter()
 # router.register(r"category",CategoryView)
 # router.register(r"product",ProductView)
@@ -34,8 +35,9 @@ urlpatterns=i18n_patterns(
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path('', include('core_app.urls')),
-    path('', include('users_app.urls')),
-    path('', include('products_app.urls')),
-    path('', include('store_app.urls')),
+    path('api/', include('core_app.urls')),
+    path('api/', include('users_app.urls')),
+    path('api/', include('products_app.urls')),
+    path('api/', include('store_app.urls')),
+    path('api/', include('orders_app.urls')),
 )

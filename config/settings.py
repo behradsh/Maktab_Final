@@ -14,6 +14,8 @@ from pathlib import Path
 from decouple import config
 import os
 from datetime import timedelta
+
+from django.conf.global_settings import LOGIN_URL
 from django.utils.translation import gettext_lazy as _
 import logging.config
 
@@ -74,9 +76,19 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'log_request_id.middleware.RequestIDMiddleware',
-
+    'corsheaders.middleware.CorsMiddleware',
+    'config.middleware.UserTypeMiddleware',
 ]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+
 CORS_ALLOW_ALL_ORIGINS = True
+# If your frontend is on a different domain
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    # Add other allowed origins
+]
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -164,9 +176,9 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
-# STATIC_ROOT = os.path.join(BASE_DIR,'static')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = 'media/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -303,3 +315,4 @@ LOGGING = {
     },
 }
 logging.config.dictConfig(LOGGING) # Finally replace our config in python logging
+LOGIN_URL = 'token_obtain_pair'

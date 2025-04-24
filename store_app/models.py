@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from users_app.models import CustomUser
-
+import jdatetime
 
 # Create your models here.
 class Store(models.Model):
@@ -23,6 +23,21 @@ class Store(models.Model):
         return (f"{self.name} - {self.pk}")
 
 
+    @property
+    def created_at_shamsi(self):
+        if self.created_at:
+            created_shamsi = jdatetime.datetime.fromgregorian(datetime=self.created_at).strftime('%Y-%m-%d %H:%M:%S')
+            return created_shamsi
+        return None
+
+    @property
+    def updated_at_shamsi(self):
+        if self.updated_at:
+            updated_shamsi = jdatetime.datetime.fromgregorian(datetime=self.updated_at).strftime('%Y-%m-%d %H:%M:%S')
+            return updated_shamsi
+        return None
+
+
 class StoreEmployee(models.Model):
     user_id = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='user_store',blank=True, null=True)
     store_id = models.ForeignKey(Store, on_delete=models.CASCADE,related_name='store_id',blank=True, null=True)
@@ -32,3 +47,10 @@ class StoreEmployee(models.Model):
 
     class Meta:
         verbose_name_plural = 'Store Employee'
+
+    @property
+    def created_at_shamsi(self):
+        if self.created_at:
+            created_shamsi = jdatetime.datetime.fromgregorian(datetime=self.created_at).strftime('%Y-%m-%d %H:%M:%S')
+            return created_shamsi
+        return None

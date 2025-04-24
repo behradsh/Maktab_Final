@@ -12,12 +12,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "store", "category", "brand", "price", "quantity")
+    list_display = ("name", "store", "category", "brand", "price", "quantity",'image')
     list_filter = ("store", "category", "brand")
     search_fields = ("name", "brand", "description")
     list_editable = ("price", "quantity")
     autocomplete_fields = ("store", "category")
-    readonly_fields = ("image",)
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):

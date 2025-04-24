@@ -2,14 +2,24 @@ from rest_framework import serializers
 from store_app.models import Store,StoreEmployee
 from users_app.models import CustomUser
 from django.contrib.auth.models import Group,Permission
+from django.utils.translation import gettext_lazy as _
 
 class StoreSerializer(serializers.ModelSerializer):
+    created_at_shamsi = serializers.SerializerMethodField()
+    updated_at_shamsi = serializers.SerializerMethodField()
     class Meta:
         model = Store
-        fields = ['id', 'name', 'address','city']
+        fields = ['id', 'name', 'address','city','created_at_shamsi','updated_at_shamsi']
         read_only_fields = ['id']
 
+    def get_created_at_shamsi(self,obj):
+        return obj.created_at_shamsi
+
+    def get_updated_at_shamsi(self,obj):
+        return obj.updated_at_shamsi
+
 class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
+    created_at_shamsi = serializers.SerializerMethodField()
     username = serializers.CharField(write_only=True, required=True)
     firstname = serializers.CharField(write_only=True, required=True)
     lastname = serializers.CharField(write_only=True, required=True)
@@ -26,6 +36,9 @@ class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
             'username', 'firstname', 'lastname', 'email', 'phone', 'gender', 'password'
         ]
         read_only_fields = ['id', 'created_at', 'user_id']
+
+    def get_created_at_shamsi(self,obj):
+        return obj.created_at_shamsi
 
     def validate(self, attrs):
         if not attrs.get('is_manager') and not attrs.get('is_operator'):
@@ -72,3 +85,55 @@ class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return emp
+
+
+class StoreEmployeeSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(),
+        required=True,
+        error_messages={
+            'does_not_exist': _('User does not exist.'),
+            'required': _('User ID is required.')
+        }
+    )
+    store_id = serializers.PrimaryKeyRelatedField(
+        queryset=Store.objects.all(),
+        required=False  # Will be set in the view
+    )
+    username = serializers.CharField(source='user_id.username', read_only=True)
+    email = serializers.EmailField(source='user_id.email', read_only=True)
+    phone = serializers.CharField(source='user_id.phone', read_only=True)
+    store_name = serializers.CharField(source='store_id.name', read_only=True)
+    created_at_shamsi = serializers.SerializerMethodField()
+
+    class Meta:
+        model = StoreEmployee
+        fields = [
+            'id',
+            'user_id',
+            'username',
+            'email',
+            'phone',
+            'store_id',
+            'store_name',
+            'is_manager',
+            'is_operator',
+            'created_at',
+            'created_at_shamsi'
+        ]
+        read_only_fields = ['created_at', 'username', 'email', 'phone', 'store_name']
+
+    def get_created_at_shamsi(self, obj):
+        return obj.created_at_shamsi
+
+    def validate(self, data):
+        # Ensure at least one role is selected
+        if not data.get('is_manager') and not data.get('is_operator'):
+            raise serializers.ValidationError(_("Employee must have at least one role (manager or operator)."))
+
+        # Prevent both roles being True if that's not allowed in your business logic
+        if data.get('is_manager') and data.get('is_operator'):
+            raise serializers.ValidationError(_("User cannot be both manager and operator."))
+
+        return data
+

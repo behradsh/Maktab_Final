@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from products_app.models import Product, Comment
 from store_app.models import Store, StoreEmployee
-from orders_app.models import Orders, OrderItems
+from orders_app.models import Orders, OrderItems,Cart,CartItem
 from users_app.models import CustomUser, Address
 
 
@@ -20,6 +20,8 @@ def create_user_groups(sender, **kwargs):
             (Address, ['add', 'view', 'change', 'delete']),
             (CustomUser, ['view', 'change']),
             (Comment, ['add', 'view', 'change', 'delete']),
+            (Cart, ['add', 'view', 'change', 'delete']),
+            (CartItem, ['add', 'view', 'change', 'delete']),
         ],
         "SellerOwners": [
             (Store, ['add', 'view', 'change', 'delete']),

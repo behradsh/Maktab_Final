@@ -5,4 +5,4 @@ class CoreAppConfig(AppConfig):
     name = 'core_app'
 
 def ready(self):
-    import signals
+    import setup_groups

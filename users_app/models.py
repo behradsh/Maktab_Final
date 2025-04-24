@@ -61,7 +61,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(_("Phone number"), max_length=13, blank=False, null=False, unique=True,
                              validators=[PHONE_VALIDATOR])
     email = models.EmailField(_("email address"), blank=False, null=False, unique=True)
-    profile_img = models.ImageField(_("profile image"), upload_to='profile_pics', blank=True, null=True, )
+    profile_img = models.ImageField(_("profile image"), upload_to='profile_pics/', null=True, )
     groups = models.ManyToManyField(
         Group,
         verbose_name=_('groups'),
@@ -116,3 +116,4 @@ class Address(models.Model):
 
     class Meta:
         verbose_name_plural = 'Address'
+

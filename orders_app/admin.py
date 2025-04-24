@@ -1,16 +1,16 @@
 from django.contrib import admin
-from .models import Orders,OrderItems
+from .models import Orders,OrderItems,Cart,CartItem
 # Register your models here.
 
 @admin.register(Orders)
 class OrdersAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer', 'status', 'discount', 'created_at')
-    list_filter = ('status', 'created_at')
-    search_fields = ('customer__username', 'customer__email', 'id')
+    list_display = ('id', 'customer', 'status', 'discount', 'created_at','store')
+    list_filter = ('status', 'created_at','store')
+    search_fields = ('customer__username', 'customer__email', 'id','store')
     readonly_fields = ('created_at',)
     fieldsets = (
         (None, {
-            'fields': ('customer', 'address', 'status')
+            'fields': ('customer', 'address', 'status','store')
         }),
         ('Pricing', {
             'fields': ('total_amount', 'discount')
@@ -50,3 +50,16 @@ class OrderItemsAdmin(admin.ModelAdmin):
     list_filter = ('order__status',)
     search_fields = ('order__id', 'product__name')
     raw_id_fields = ('order', 'product')  # Useful if you have many orders/products
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'created_at', 'updated_at',)
+    list_filter = ('user','created_at','updated_at')
+    search_fields = ('user__id',)
+
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('id', 'cart', 'product', 'quantity',)
+    list_filter = ('cart',)
+    search_fields = ('cart__id', 'product__name')
