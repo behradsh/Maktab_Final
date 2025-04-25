@@ -130,48 +130,6 @@ class SellerRegisterSerializer(serializers.ModelSerializer):
             }
         return rep
 
-
-# class LoginSerializer(serializers.ModelSerializer):
-#     email = serializers.EmailField(write_only=True,required=True)
-#     password = serializers.CharField(max_length=68, write_only=True, )
-#     username = serializers.CharField(max_length=25,)
-#     token = serializers.SerializerMethodField()
-#     user_type = serializers.SerializerMethodField()
-#     redirect_url = serializers.SerializerMethodField()8888
-#     def get_token(self,obj):
-#         user = CustomUser.objects.get(username=obj['username'])
-#         return {
-#             'refresh':str(RefreshToken.for_user(user)),
-#             'access':str(RefreshToken.for_user(user).access_token),
-#         }
-#     def get_user_type(self,obj):
-#         user = CustomUser.objects.get(username=obj['username'])
-#         return 'customer' if user.is_customer else 'seller'
-#     def get_redirect_url(self,obj):
-#         type = self.get_user_type(obj)
-#         if type == 'customer':
-#             return '/customer/dashboard/'
-#         else:
-#             return '/seller/dashboard/'
-#
-#     class Meta:
-#         model = CustomUser
-#         fields = ('email','username','password','token','user_type','redirect_url')
-#     def validate(self, attrs):
-#         username = attrs.get('username', '')
-#         password = attrs.get('password', '')
-#         user = authenticate(username=username, password=password)
-#         if not user:
-#             raise AuthenticationFailed('Invalid Credentials,Try Again')
-#         if not user.is_active:
-#             raise AuthenticationFailed('Your account is inactive,Contact Admin')
-#         return {
-#             'email': user.email,
-#             'username': user.username,
-#             'token': user.token,
-#             'user_type':user.is_customer,
-#         }
-
 class LoginOTPRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(
@@ -388,4 +346,5 @@ class SellerChangePasswordSerializer(serializers.Serializer):
         if attrs['new_password'] != attrs['new_password2']:
             raise serializers.ValidationError({"new_password": "Password fields didn't match."})
         return attrs
+
 

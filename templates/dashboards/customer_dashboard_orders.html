@@ -55,14 +55,14 @@
                             </a>
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="customer_dashboard_oders.html">Orders </a>
-                                    <a class="nav-link" href="customer_dashboard_address.html">Address</a>
+                                    <a class="nav-link" id='customer_orders';>Orders</a>
+                                    <a class="nav-link" id='customer_address'>Address</a>
                                 </nav>
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="customer_dashboard_comments.html">Comments</a>
+                                    <a class="nav-link" id='customer_comments'>Comments</a>
                                 </nav>
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="customer_dashboard_passwordchange.html">ChangePassword</a>
+                                    <a class="nav-link" id='customer_change_password'>ChangePassword</a>
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
@@ -270,17 +270,18 @@ if (accessToken && refreshToken) {
             </script>
             <script>
 
-              document.getElementById('customer_change_password').addEventListener('click', function(e) {
-                // Prevent the default link behavior
-                e.preventDefault();
-                                              // Get tokens from local storage
-              const accessToken = localStorage.getItem('accessToken');
-              const refreshToken = localStorage.getItem('refreshToken');
-
-                
-                // Redirect to the dashboard with tokens as parameters
-                window.location.href = `customer_dashboard_change_pass.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
-            });
-          </script>
+                document.getElementById('customer_change_password').addEventListener('click', function(e) {
+                  // Prevent the default link behavior
+                  e.preventDefault();
+                                                // Get tokens from local storage
+                const accessToken = localStorage.getItem('accessToken');
+                const refreshToken = localStorage.getItem('refreshToken');
+  
+                  
+                  // Redirect to the dashboard with tokens as parameters
+                  window.location.href = `customer_dashboard_change_pass.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+              });
+            </script>
+  
     </body>
 </html>

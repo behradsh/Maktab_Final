@@ -47,17 +47,6 @@ class Orders(models.Model):
             updated_shamsi = jdatetime.datetime.fromgregorian(datetime=self.updated_at).strftime('%Y-%m-%d %H:%M:%S')
             return updated_shamsi
         return None
-    # def save(self,*args,**kwargs):
-    #     if not self.discount:
-    #         self.discount=0
-    #     Items = OrderItems.objects.filter(order=self)
-    #     sum_total = 0
-    #     for item in Items:
-    #         if item.discount:
-    #             sum_total += item.price * item.quantity * (1/item.discount)
-    #         sum_total += item.price * item.quantity
-    #     self.total_amount += sum_total
-    #     super().save(*args, **kwargs)
 
 
 class OrderItemsManager(models.Manager):
@@ -68,7 +57,7 @@ class OrderItemsManager(models.Manager):
 
 
 class OrderItems(models.Model):
-    order = models.ForeignKey(Orders, on_delete=models.PROTECT, blank=True, null=True)
+    order = models.ForeignKey(Orders, on_delete=models.PROTECT)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, blank=True, null=True)
     quantity = models.PositiveIntegerField(_("Quantity"), blank=False, null=False)
     price = models.DecimalField(_("Price"), max_digits=10, decimal_places=2, null=True, blank=True)
@@ -90,6 +79,9 @@ class OrderItems(models.Model):
             self.product.quantity -= self.quantity
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f"{self.order.id}--{self.product.name}"
+
     class Meta:
         verbose_name_plural = _("Order Items")
 
@@ -103,7 +95,7 @@ class Cart(models.Model):
         verbose_name_plural = _("Cart")
 
     def __str__(self):
-        return f"Cart for {self.user or 'Anonymous'}"
+        return f"{self.id}--{self.user.first_name}--{self.user.last_name}"
 
     @property
     def created_at_shamsi(self):
@@ -126,7 +118,7 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name} in cart"
+        return f"{self.cart.id}--{self.product.product_name}"
 
     class Meta:
         unique_together = ('cart', 'product')

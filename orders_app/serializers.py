@@ -6,6 +6,12 @@ from store_app.serializers import StoreSerializer
 from users_app.serializers import AddressSerializer
 from products_app.serializers import ProductSerializer
 from products_app.models import Product
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import ListAPIView
+from django.contrib import messages
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -73,14 +79,12 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
-    total = serializers.SerializerMethodField()
     created_at_shamsi = serializers.SerializerMethodField()
     updated_at_shamsi = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
-        fields = ['id', 'items', 'total']
-        read_only_fields = ['total']
+        fields = ['id', 'items', 'created_at_shamsi', 'updated_at_shamsi']
 
     def get_created_at_shamsi(self, obj):
         return obj.created_at_shamsi

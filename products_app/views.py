@@ -59,7 +59,7 @@ class SellerProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
     def perform_destroy(self, instance):
         user = self.request.user
         if user.groups.filter(name='SellerOperators').exists():
-            raise PermissionDenied("Operators cannot delete products.")
+            raise Exception("Operators cannot delete products.")
         instance.delete()
 
 

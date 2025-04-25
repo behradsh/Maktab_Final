@@ -1,5 +1,5 @@
 from itertools import count
-
+from django.views.generic import TemplateView
 from django.shortcuts import render
 from django.utils import timezone
 from datetime import timedelta
@@ -157,26 +157,6 @@ class VerifyOTPView(APIView):
             user.otp = None
             user.otp_expiry_time = None
             user.save()
-            # Merge session cart with user cart
-            if 'cart' in request.session:
-                session_cart = request.session['cart']
-                user_cart = get_user_cart(user)
-                for product_id, quantity in session_cart.items():
-                    try:
-                        product = Product.objects.get(id=product_id)
-                        cart_item, created = CartItem.objects.get_or_create(
-                            cart=user_cart,
-                            product=product,
-                            defaults={'quantity': quantity}
-                        )
-                        if not created:
-                            cart_item.quantity += quantity
-                            cart_item.save()
-                    except Product.DoesNotExist:
-                        continue
-                del request.session['cart']
-                request.session.modified = True
-                serializer = CustomerProfileSerializer(user)
             # Return the token and user data
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -672,3 +652,7 @@ class SellerReportsView(generics.GenericAPIView):
         if hasattr(user, 'store'):
             return user.store
         raise Exception("User is not a store owner")
+
+
+class LoginTemplateView(TemplateView):
+    template_name = "auth/customer_login_username.html"
