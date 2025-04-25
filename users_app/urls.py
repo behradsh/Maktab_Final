@@ -17,20 +17,24 @@ from .views import (LoginOTPView,
                     PhoneVerifyOTPView,
                     CustomerAddressView,
                     CustomerAddressDetailView,
-    #CustomerPanelViewSet,
-SellerProfileView,
-SellerChangePasswordView,
-HomeView,
-    )
+                    CustomerDashboardTemplate,
+                    SellerProfileView,
+                    SellerChangePasswordView,
+                    HomeView,CustomerChangePasswordTemplate,
+CustomerOrdersListTemplate,CustomerAddressListTemplate,
+CustomerAddressEditTemplate,CustomerAddressCreateTemplate,
+                    )
 from orders_app.views import (CustomerOrderHistoryView)
-from products_app.views import (CommentCreateView,UserCommentsListView)
+from products_app.views import (CommentCreateView, UserCommentsListView)
 from store_app.views import (SellerStoreRetrieveView,
-                             SellerStoreUpdateView,)
+                             SellerStoreUpdateView, )
 from products_app.views import (SellerProductListCreateView, SellerProductRetrieveUpdateDestroyView,
-    CategoryListCreateView,CategoryRetrieveUpdateDestroyView)
+                                CategoryListCreateView, CategoryRetrieveUpdateDestroyView)
+
 
 def is_customer(user):
     return user.is_customer
+
 
 def is_seller(user):
     return not user.is_customer
@@ -39,7 +43,6 @@ def is_seller(user):
 router = DefaultRouter()
 # router.register(r'customer', CustomerPanelViewSet, basename='customer')
 # router.register(r'seller', SellerPanelViewSet, basename='seller')
-
 
 
 urlpatterns = [
@@ -54,11 +57,19 @@ urlpatterns = [
     path('api/login/phone/verify/', PhoneVerifyOTPView.as_view(), name='phone_verify_otp'),
     path('api/logout/', LogOutAPIView.as_view(), name='logout'),
     path('api/customer/dashboard/profile/', CustomerProfileView.as_view(), name='user_dashboard_profile'),
+    path('customer/dashboard/', CustomerDashboardTemplate.as_view(), name='user_dashboard_profile'),
     path('api/customer/dashboard/profile/change_password/', ChangePasswordView.as_view(), name='change_password'),
-    path('api/customer/dashboard/orders/', CustomerOrderHistoryView.as_view(), name='customer_order_history'),
-    path('customer/dashboard/orders/', TemplateView.as_view(), name='customer_order_history'),
-    # path('api/customer/dashboard/address/', CustomerAddressView.as_view(), name='customer_address'),
-    path('api/customer/dashboard/address/<int:pk>/', CustomerAddressDetailView.as_view(), name='customer_address_update'),
-    path('api/seller/dashboard/profile/change_password/', SellerChangePasswordView.as_view(), name='change_password_seller'),
+    path('customer/dashboard/change_password/', CustomerChangePasswordTemplate.as_view(), name='customer_change_password'),
+    path('api/customer/dashboard/orders/', CustomerOrderHistoryView.as_view(), name='customer_orders'),
+    path('customer/dashboard/orders/', CustomerOrdersListTemplate.as_view(), name='customer_order_history'),
+    path('api/customer/dashboard/address/', CustomerAddressView.as_view(), name='customer_address'),
+    path('customer/dashboard/address/create/', CustomerAddressCreateTemplate.as_view(), name='customer_address_create'),
+    path('customer/dashboard/address/', CustomerAddressListTemplate.as_view(), name='customer_address_list'),
+    path('api/customer/dashboard/address/<int:pk>/', CustomerAddressDetailView.as_view(),
+         name='customer_address_update_api'),
+    path('customer/dashboard/address/<int:pk>/', CustomerAddressEditTemplate.as_view(),
+         name='customer_address_update'),
+    path('api/seller/dashboard/profile/change_password/', SellerChangePasswordView.as_view(),
+         name='change_password_seller'),
     # path('', include(router.urls)),
 ]

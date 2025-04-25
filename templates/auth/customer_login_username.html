@@ -133,8 +133,8 @@ async function handleLogin(event) {
         // Parse JWT token to get user type
         const tokenData = parseJwt(data.access);
         
-        //window.location.href = '../dashboards/customer_dashboard.html'; // Customer dashboard
-        window.location.href = `../dashboards/customer_dashboard.html?accessToken=${encodeURIComponent(data.access)}&refreshToken=${encodeURIComponent(data.refresh)}`;
+        window.location.href = 'http://127.0.0.1:8000/en/customer/dashboard/'; // Customer dashboard
+        //window.location.href = `../dashboards/customer_dashboard.html?accessToken=${encodeURIComponent(data.access)}&refreshToken=${encodeURIComponent(data.refresh)}`;
 
 
 

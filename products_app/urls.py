@@ -2,7 +2,8 @@ from django.urls import path,include
 from .views import (SellerProductListCreateView,SellerProductRetrieveUpdateDestroyView
 ,CategoryListCreateView,CategoryRetrieveUpdateDestroyView,
                     ProductListHomeView,CategoryListHomeView,
-                    CommentCreateView,UserCommentsListView)
+                    CommentCreateView,UserCommentsListView,
+                    CustomerCommentsListTemplate,)
 
 urlpatterns = [
     path('products/', ProductListHomeView.as_view(),name='product_list_home'),
@@ -12,6 +13,7 @@ urlpatterns = [
     path('api/seller/dashboard/category/', CategoryListCreateView.as_view(), name='category_list'),
     path('api/seller/dashboard/category/<int:pk>/', CategoryRetrieveUpdateDestroyView.as_view(),
          name='category_update_delete'),
-    path('api/customer/dashboard/comments/', UserCommentsListView.as_view(), name='customer_comments'),
+    path('api/customer/dashboard/comments/', UserCommentsListView.as_view(), name='customer_comments_api'),
+    path('customer/dashboard/comments/', CustomerCommentsListTemplate.as_view(), name='customer_comments'),
     path('api/customer/dashboard/comments/create/', CommentCreateView.as_view(), name='customer_comments_create'),
 ]

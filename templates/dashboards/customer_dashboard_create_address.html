@@ -1,3 +1,5 @@
+{% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -8,7 +10,7 @@
         <meta name="author" content="" />
         <title>Dashboard - SB Admin</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
-        <link href="css/styles.css" rel="stylesheet" />
+        <link href="{% static 'dashboards/css/styles.css' %}" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body class="sb-nav-fixed">
@@ -43,7 +45,7 @@
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Home</div>
-                            <a class="nav-link" href="index.html">
+                            <a class="nav-link" href="http://127.0.0.1:8000/en/customer/dashboard/">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
@@ -124,60 +126,42 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="js/scripts.js"></script>
+        <script src="{% static 'dashboards/css/js/scripts.js' %}"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
-        <script src="js/datatables-simple-demo.js"></script>
         <script>
-// Function to parse query parameters
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-
-// Retrieve tokens from query parameters
-const accessToken = getQueryParam('accessToken');
-const refreshToken = getQueryParam('refreshToken');
-
-// Optionally, store them in localStorage for further use
-if (accessToken && refreshToken) {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-}
-        </script>
-        <script>
-            // Function to fetch user profile and populate the form
-            async function fetchUserProfile() {
-                const accessToken = localStorage.getItem('accessToken');
-                if (!accessToken) {
-                    console.error('Access token is missing.');
-                    return;
+                // Function to fetch user profile and populate the form
+                // Function to populate the form with user data
+                function populateProfileForm(user) {
+                    const name_of_profile = document.getElementById('login_user')
+                    name_of_profile.innerHTML=`Logged in as:${user.username}`
                 }
-        
-                try {
-                    const response = await fetch('http://127.0.0.1:8000/en/api/customer/dashboard/profile/', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-        
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch user profile.');
+                async function fetchUserProfile() {
+                    const accessToken = localStorage.getItem('accessToken');
+                    if (!accessToken) {
+                        console.error('Access token is missing.');
+                        return;
                     }
-        
-                    const data = await response.json();
-                    populateProfileForm(data); // Assuming the response is an array with one object
-                } catch (error) {
-                    console.error('Error fetching user profile:', error);
-                }
-            }
-        
-            // Function to populate the form with user data
-            function populateProfileForm(user) {
-                const name_of_profile = document.getElementById('login_user')
-                name_of_profile.innerHTML=`Logged in as:${user.username}`
-            }
+            
+                    try {
+                        const response = await fetch('http://127.0.0.1:8000/en/api/customer/dashboard/profile/', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${accessToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+            
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch user profile.');
+                        }
+            
+                        const data = await response.json();
+                        populateProfileForm(data); // Assuming the response is an array with one object
+                    } catch (error) {
+                        console.error('Error fetching user profile:', error);
+                    }
+                }    
+            
             function populateNewAddressForm() {
                 const newAddressForm = document.getElementById('new_address_form');
             }
@@ -229,7 +213,7 @@ if (accessToken && refreshToken) {
               const refreshToken = localStorage.getItem('refreshToken');
               
               // Redirect to the dashboard with tokens as parameters
-              window.location.href = `customer_dashboard_orders.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+              window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/orders/`;
             });
         </script>
 
@@ -245,7 +229,7 @@ if (accessToken && refreshToken) {
                 
                 
                 // Redirect to the dashboard with tokens as parameters
-                window.location.href = `customer_dashboard_address.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+                window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/address/`;
               });
             </script>
             <script>
@@ -258,7 +242,7 @@ if (accessToken && refreshToken) {
               const refreshToken = localStorage.getItem('refreshToken');
 
                 // Redirect to the dashboard with tokens as parameters
-                window.location.href = `customer_dashboard_comments.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+                window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/comments/`;
               });
             </script>
             <script>
@@ -272,23 +256,10 @@ if (accessToken && refreshToken) {
 
                 
                 // Redirect to the dashboard with tokens as parameters
-                window.location.href = `customer_dashboard_change_pass.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+                window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/change_password/`;
             });
           </script>
-                      <script>
 
-              document.getElementById('customer_change_password').addEventListener('click', function(e) {
-                // Prevent the default link behavior
-                e.preventDefault();
-                                              // Get tokens from local storage
-              const accessToken = localStorage.getItem('accessToken');
-              const refreshToken = localStorage.getItem('refreshToken');
-
-                
-                // Redirect to the dashboard with tokens as parameters
-                window.location.href = `customer_dashboard_change_pass.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
-            });
-          </script>
           
     </body>
 </html>

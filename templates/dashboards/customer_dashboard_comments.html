@@ -1,3 +1,5 @@
+{% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -8,7 +10,7 @@
         <meta name="author" content="" />
         <title>Dashboard - SB Admin</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
-        <link href="css/styles.css" rel="stylesheet" />
+        <link href="{% static 'dashboards/css/styles.css' %}" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body class="sb-nav-fixed">
@@ -43,7 +45,7 @@
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Home</div>
-                            <a class="nav-link">
+                            <a class="nav-link" href="http://127.0.0.1:8000/en/customer/dashboard/">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
@@ -105,28 +107,15 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="js/scripts.js"></script>
+        <script src="{% static 'dashboards/css/js/scripts.js' %}"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
-        <script src="js/datatables-simple-demo.js"></script>
-        <script>
-// Function to parse query parameters
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-
-// Retrieve tokens from query parameters
-const accessToken = getQueryParam('accessToken');
-const refreshToken = getQueryParam('refreshToken');
-
-// Optionally, store them in localStorage for further use
-if (accessToken && refreshToken) {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-}
-        </script>
         <script>
             // Function to fetch user profile and populate the form
+            // Function to populate the form with user data
+            function populateProfileForm(user) {
+                const name_of_profile = document.getElementById('login_user')
+                name_of_profile.innerHTML=`Logged in as:${user.username}`
+            }
             async function fetchUserProfile() {
                 const accessToken = localStorage.getItem('accessToken');
                 if (!accessToken) {
@@ -153,15 +142,9 @@ if (accessToken && refreshToken) {
                     console.error('Error fetching user profile:', error);
                 }
             }
-        
-            // Function to populate the form with user data
-            function populateProfileForm(user) {
-                const name_of_profile = document.getElementById('login_user')
-                name_of_profile.innerHTML=`Logged in as:${user.username}`
-            }
-        
-            // Fetch user profile on page load
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
+
+            
         </script>
         <script>
             // Function to fetch user comments and populate the comments section
@@ -235,7 +218,7 @@ if (accessToken && refreshToken) {
               const refreshToken = localStorage.getItem('refreshToken');
               
               // Redirect to the dashboard with tokens as parameters
-              window.location.href = `customer_dashboard_orders.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+              window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/orders/`;
             });
         </script>
 
@@ -251,7 +234,7 @@ if (accessToken && refreshToken) {
                 
                 
                 // Redirect to the dashboard with tokens as parameters
-                window.location.href = `customer_dashboard_address.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+                window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/address/`;
               });
             </script>
             <script>
@@ -264,7 +247,7 @@ if (accessToken && refreshToken) {
               const refreshToken = localStorage.getItem('refreshToken');
 
                 // Redirect to the dashboard with tokens as parameters
-                window.location.href = `customer_dashboard_comments.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+                window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/comments/`;
               });
             </script>
             <script>
@@ -278,8 +261,9 @@ if (accessToken && refreshToken) {
 
                 
                 // Redirect to the dashboard with tokens as parameters
-                window.location.href = `customer_dashboard_change_pass.html?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+                window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/change_password/`;
             });
           </script>
+
     </body>
 </html>

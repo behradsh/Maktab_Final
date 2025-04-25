@@ -338,79 +338,24 @@ class CustomerAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
         return "Address deleted."
 
 
-# class CustomerPanelViewSet(viewsets.ModelViewSet):
-#     permission_classes = [IsCustomerOrNot]
-#     serializer_class = CustomerProfileSerializer
-#
-#     def get_queryset(self):
-#         # Restrict to the authenticated user
-#         return CustomUser.objects.filter(id=self.request.user.id)
-#
-#     def get_object(self):
-#         # Always return the authenticated user
-#         return self.request.user
-#
-#     @action(detail=False, methods=['get'], url_path='address')
-#     def list_addresses(self, request):
-#         addresses = request.user.addresses.all()
-#         serializer = AddressSerializer(addresses, many=True)
-#         return Response(serializer.data)
-#
-#     @action(detail=False, methods=['post'], url_path='address')
-#     def create_address(self, request):
-#         serializer = AddressSerializer(data=request.data, context={'request': request})
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save(user=request.user)
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#
-#     @action(detail=False, methods=['patch','put'], url_path='address/(?P<address_id>[^/.]+)')
-#     def update_address(self, request, address_id=None):
-#         try:
-#             address = request.user.addresses.get(id=address_id)
-#         except Address.DoesNotExist:
-#             return Response({'detail': 'Address not found'}, status=status.HTTP_404_NOT_FOUND)
-#         serializer = AddressSerializer(address, data=request.data, partial=True, context={'request': request})
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data)
-#
-#     @action(detail=False, methods=['delete'], url_path='address/(?P<address_id>[^/.]+)')
-#     def delete_address(self, request, address_id=None):
-#         try:
-#             address = request.user.addresses.get(id=address_id)
-#         except Address.DoesNotExist:
-#             return Response({'detail': 'Address not found'}, status=status.HTTP_404_NOT_FOUND)
-#         address.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-#
-#     @action(detail=False, methods=['get'], url_path='orders')
-#     def list_orders(self, request):
-#         orders = request.user.orders.all()
-#         serializer = OrderSerializer(orders, many=True)
-#         return Response(serializer.data)
 
 class SellerProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = SellerProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsSellerOrNot]
 
     def get_object(self):
         return self.request.user
-    # serializer_class = SellerProfileSerializer
-    # permission_classes = [permissions.IsAuthenticated, IsSellerOrNot]
-    #
-    # def get_object(self):
-    #     return self.request.user
 
-    # def retrieve(self, request, *args, **kwargs):
-    #     user = self.get_object()
-    #     return Response({
-    #         'id': user.id,
-    #         'username': user.username,
-    #         'email': user.email,
-    #         'phone': str(user.phone),
-    #         'gender': user.gender,
-    #         'profile_img': user.profile_img.url if user.profile_img else None
-    #     })
+    def retrieve(self, request, *args, **kwargs):
+        user = self.get_object()
+        return Response({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'phone': str(user.phone),
+            'gender': user.gender,
+            'profile_img': user.profile_img.url if user.profile_img else None
+        })
 
 
 class SellerChangePasswordView(generics.UpdateAPIView):
@@ -656,3 +601,23 @@ class SellerReportsView(generics.GenericAPIView):
 
 class LoginTemplateView(TemplateView):
     template_name = "auth/customer_login_username.html"
+
+class CustomerDashboardTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard.html"
+
+class CustomerChangePasswordTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard_change_pass.html"
+
+class CustomerOrdersListTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard_orders.html"
+
+
+class CustomerAddressListTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard_address.html"
+class CustomerAddressEditTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard_edit_address.html"
+class CustomerAddressCreateTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard_create_address.html"
+
+
+

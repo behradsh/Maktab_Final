@@ -57,7 +57,7 @@ class OrderItemsManager(models.Manager):
 
 
 class OrderItems(models.Model):
-    order = models.ForeignKey(Orders, on_delete=models.PROTECT)
+    order = models.ForeignKey(Orders, on_delete=models.PROTECT,null=False, blank=False)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, blank=True, null=True)
     quantity = models.PositiveIntegerField(_("Quantity"), blank=False, null=False)
     price = models.DecimalField(_("Price"), max_digits=10, decimal_places=2, null=True, blank=True)

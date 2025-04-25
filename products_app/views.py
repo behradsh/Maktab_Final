@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views.generic import TemplateView
 from rest_framework.views import APIView
 from rest_framework import generics,permissions
 from .models import (Category,Product,Comment)
@@ -25,6 +26,8 @@ class UserCommentsListView(generics.ListAPIView):
     def get_queryset(self):
         return Comment.objects.filter(user=self.request.user)
 
+class CustomerCommentsListTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard_comments.html"
 
 class SellerProductListCreateView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
