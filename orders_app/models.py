@@ -67,16 +67,15 @@ class OrderItems(models.Model):
     objects = OrderItemsManager()
 
     def save(self, *args, **kwargs):
-        # If no price is set and product exists, use the product's price
-        if self.product and (not self.price or self.price == 0):
+        if self.product:
             if not self.discount:
                 self.discount = 0
-            if self.discount == 0:
-                self.price = self.product.price * self.quantity
-            else:
-                calculate_discount = ((float(self.product.price) * float(self.quantity)) * float(self.discount)) / 100
-                self.price = (float(self.product.price) * float(self.quantity)) - calculate_discount
+            self.price = self.product.price * self.quantity
+            if self.discount > 0:
+                discount_amount = (self.price * self.discount) / 100
+                self.price -= discount_amount
             self.product.quantity -= self.quantity
+            self.product.save()
         super().save(*args, **kwargs)
 
     def __str__(self):

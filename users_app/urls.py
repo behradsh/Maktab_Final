@@ -23,6 +23,10 @@ from .views import (LoginOTPView,
                     HomeView,CustomerChangePasswordTemplate,
 CustomerOrdersListTemplate,CustomerAddressListTemplate,
 CustomerAddressEditTemplate,CustomerAddressCreateTemplate,
+CustomerRegisterTemplate,SellerRegisterTemplate,HomeTemplate,
+SellerDashboardTemplate,SellerDashboardChangePassTemplate,
+SellerOrderListView,SellerOrderUpdateView,SellerDashboardOrdersTemplate,
+SellerDashboardOrdersEditTemplate,
                     )
 from orders_app.views import (CustomerOrderHistoryView)
 from products_app.views import (CommentCreateView, UserCommentsListView)
@@ -46,10 +50,14 @@ router = DefaultRouter()
 
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home_page'),
-    path('api/seller/dashboard/profile/', SellerProfileView.as_view(), name='seller_dashboard'),
-    path('api/register/customer/', CustomerRegisterView.as_view(), name='customer_register'),
-    path('api/register/seller/', SellerRegisterView.as_view(), name='seller_register'),
+    # path('', HomeView.as_view(), name='home_page_api'),
+    path('', HomeTemplate.as_view(), name='home_page'),
+    path('api/seller/dashboard/profile/', SellerProfileView.as_view(), name='seller_dashboard_api'),
+    path('seller/dashboard/', SellerDashboardTemplate.as_view(), name='seller_dashboard'),
+    path('api/register/customer/', CustomerRegisterView.as_view(), name='customer_register_api'),
+    path('register/customer/', CustomerRegisterTemplate.as_view(), name='customer_register'),
+    path('api/register/seller/', SellerRegisterView.as_view(), name='seller_register_api'),
+    path('register/seller/', SellerRegisterTemplate.as_view(), name='seller_register'),
     path('api/login/email/', LoginOTPView.as_view(), name='email_login'),
     path('api/login/otp-resend/', ResendOTPView.as_view(), name='otp_resend'),
     path('api/login/email/verify/', VerifyOTPView.as_view(), name='email_verify_otp'),
@@ -57,7 +65,7 @@ urlpatterns = [
     path('api/login/phone/verify/', PhoneVerifyOTPView.as_view(), name='phone_verify_otp'),
     path('api/logout/', LogOutAPIView.as_view(), name='logout'),
     path('api/customer/dashboard/profile/', CustomerProfileView.as_view(), name='user_dashboard_profile'),
-    path('customer/dashboard/', CustomerDashboardTemplate.as_view(), name='user_dashboard_profile'),
+    path('customer/dashboard/', CustomerDashboardTemplate.as_view(), name='customer_dashboard_profile'),
     path('api/customer/dashboard/profile/change_password/', ChangePasswordView.as_view(), name='change_password'),
     path('customer/dashboard/change_password/', CustomerChangePasswordTemplate.as_view(), name='customer_change_password'),
     path('api/customer/dashboard/orders/', CustomerOrderHistoryView.as_view(), name='customer_orders'),
@@ -70,6 +78,17 @@ urlpatterns = [
     path('customer/dashboard/address/<int:pk>/', CustomerAddressEditTemplate.as_view(),
          name='customer_address_update'),
     path('api/seller/dashboard/profile/change_password/', SellerChangePasswordView.as_view(),
+         name='change_password_seller_api'),
+    path('seller/dashboard/profile/change_password/', SellerDashboardChangePassTemplate.as_view(),
          name='change_password_seller'),
+    path('api/seller/dashboard/orders/', SellerOrderListView.as_view(),
+         name='seller_orders_api'),
+    path('api/seller/dashboard/orders/<int:pk>/', SellerOrderUpdateView.as_view(),
+         name='seller_orders_edit_api'),
+    path('seller/dashboard/orders/', SellerDashboardOrdersTemplate.as_view(),
+         name='seller_orders'),
+    path('seller/dashboard/orders/<int:pk>/', SellerDashboardOrdersEditTemplate.as_view(),
+         name='seller_orders_edit'),
+
     # path('', include(router.urls)),
 ]

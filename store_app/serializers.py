@@ -20,22 +20,23 @@ class StoreSerializer(serializers.ModelSerializer):
 
 class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
     created_at_shamsi = serializers.SerializerMethodField()
-    username = serializers.CharField(write_only=True, required=True)
-    firstname = serializers.CharField(write_only=True, required=True)
+    username = serializers.CharField(write_only=True, required=True,)  # Include username from CustomUser
+    firstname = serializers.CharField(write_only=True, required=True,)
     lastname = serializers.CharField(write_only=True, required=True)
     email = serializers.EmailField(write_only=True, required=True)
     phone = serializers.CharField(write_only=True, required=True)
     gender = serializers.BooleanField(write_only=True, required=True)
     password = serializers.CharField(write_only=True, required=True)
-    store_id = serializers.PrimaryKeyRelatedField(queryset=Store.objects.all(), required=True)
+    is_manager = serializers.BooleanField(write_only=True,required=False)
+    is_operator = serializers.BooleanField(write_only=True,required=False)
 
     class Meta:
         model = StoreEmployee
         fields = [
             'id', 'user_id', 'store_id', 'is_manager', 'is_operator', 'created_at',
-            'username', 'firstname', 'lastname', 'email', 'phone', 'gender', 'password'
+            'username', 'firstname', 'lastname', 'email', 'phone', 'gender', 'password','created_at_shamsi',
         ]
-        read_only_fields = ['id', 'created_at', 'user_id']
+        read_only_fields = ['id', 'created_at', 'user_id',]
 
     def get_created_at_shamsi(self,obj):
         return obj.created_at_shamsi
@@ -55,6 +56,8 @@ class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
         gender = validated_data.pop('gender')
         password = validated_data.pop('password')
         store = validated_data.pop('store_id')
+        is_manager = validated_data.pop('is_manager', False)
+        is_operator = validated_data.pop('is_operator', False)
 
         # Create CustomUser
         user = CustomUser.objects.create(
@@ -82,6 +85,8 @@ class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
         emp = StoreEmployee.objects.create(
             user_id=user,
             store_id=store,
+            is_manager=is_manager,
+            is_operator=is_operator,
             **validated_data
         )
         return emp

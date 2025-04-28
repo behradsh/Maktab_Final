@@ -6,8 +6,8 @@ from .views import (SellerProductListCreateView,SellerProductRetrieveUpdateDestr
                     CustomerCommentsListTemplate,)
 
 urlpatterns = [
-    path('products/', ProductListHomeView.as_view(),name='product_list_home'),
-    path('category/', CategoryListHomeView.as_view(),name='category_list_home'),
+    path('api/products/', ProductListHomeView.as_view(),name='product_list_home'),
+    path('api/category/', CategoryListHomeView.as_view(),name='category_list_home'),
     path('api/seller/dashboard/product/', SellerProductListCreateView.as_view(),name='product_list'),
     path('api/seller/dashboard/product/<int:pk>/', SellerProductRetrieveUpdateDestroyView.as_view(),name='product_update_delete'),
     path('api/seller/dashboard/category/', CategoryListCreateView.as_view(), name='category_list'),

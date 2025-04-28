@@ -39,8 +39,8 @@ class Store(models.Model):
 
 
 class StoreEmployee(models.Model):
-    user_id = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='user_store',blank=True, null=True)
-    store_id = models.ForeignKey(Store, on_delete=models.CASCADE,related_name='store_id',blank=True, null=True)
+    user_id = models.OneToOneField(CustomUser, on_delete=models.PROTECT,related_name='user_store',blank=True, null=True)
+    store_id = models.ForeignKey(Store, on_delete=models.PROTECT,related_name='store_id',blank=True, null=True,)
     is_manager = models.BooleanField(_("Manager"), default=False)
     is_operator = models.BooleanField(_("Operator"), default=False)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)

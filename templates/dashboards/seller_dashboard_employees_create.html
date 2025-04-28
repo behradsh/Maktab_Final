@@ -87,9 +87,50 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Dashboard</h1>
-                        <section id='profile_form'>
-
+                        <h1 class="mt-4">Employee Create</h1>
+                        <section id="employee_create_form">
+                            <form id="createEmployeeForm" class="needs-validation" novalidate>
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="firstname" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstname" name="firstname" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="lastname" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastname" name="lastname" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone</label>
+                                    <input type="text" class="form-control" id="phone" name="phone" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <select class="form-select" id="gender" name="gender" required>
+                                        <option value="1">Male</option>
+                                        <option value="0">Female</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="is_manager" class="form-label">Is Manager</label>
+                                    <input type="checkbox" class="form-check-input" id="is_manager" name="is_manager">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="is_operator" class="form-label">Is Operator</label>
+                                    <input type="checkbox" class="form-check-input" id="is_operator" name="is_operator">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create Employee</button>
+                            </form>
                         </section>
                         
                         <div class="row">
@@ -142,44 +183,6 @@
             function populateProfileForm(user) {
                 const name_of_profile = document.getElementById('login_user')
                 name_of_profile.innerHTML=`Logged in as:${user.username}`
-                const profileForm = document.getElementById('profile_form');
-                profileForm.innerHTML = `
-                    <form id="userProfileForm">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" value="${user.username}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="first_name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" value="${user.first_name}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="last_name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" value="${user.last_name}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="${user.email}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <select class="form-control" id="gender" name="gender">
-                                <option value="true" ${user.gender ? 'selected' : ''}>Male</option>
-                                <option value="false" ${!user.gender ? 'selected' : ''}>Female</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="profile_img" class="form-label">Profile Image</label>
-                            <img src="${user.profile_img}" alt="Profile Image" class="img-thumbnail mb-2" style="max-width: 150px;" />
-                            <input type="file" class="form-control" id="profile_img" name="profile_img" />
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="updateUserProfile()">Update Profile</button>
-                    </form>
-                `;
             }
         
             // Function to update user profile
@@ -197,7 +200,7 @@
                     const response = await fetch('http://127.0.0.1:8000/en/api/customer/dashboard/profile/', {
                         method: 'PATCH',
                         headers: {
-                            'Authorization': `Bearer ${aseller_storeccessToken}`
+                            'Authorization': `Bearer ${accessToken}`
                         },
                         body: formData
                     });
@@ -215,6 +218,52 @@
         
             // Fetch user profile on page load
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
+        </script>
+        <script>
+            document.getElementById('createEmployeeForm').addEventListener('submit', async function (e) {
+                e.preventDefault(); // Prevent default form submission
+            
+                const form = e.target;
+                const formData = new FormData(form);
+            
+                // Convert form data to JSON
+                const data = {};
+                formData.forEach((value, key) => {
+                    if (key === 'is_manager' || key === 'is_operator') {
+                        data[key] = form[key].checked; // Convert checkbox state to true/false
+                    } else {
+                        data[key] = value;
+                    }
+                });
+            
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    alert('Access token is missing. Please log in again.');
+                    return;
+                }
+            
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/en/api/seller/dashboard/employee/create/', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+            
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || JSON.stringify(errorData));
+                    }
+            
+                    alert('Employee created successfully!');
+                    window.location.href = "{% url 'employee_list' %}"; // Redirect to employee list page
+                } catch (error) {
+                    console.error('Error creating employee:', error);
+                    alert(error.message);
+                }
+            });
         </script>
         <script>
             document.getElementById('seller_store').addEventListener('click', function(e) {

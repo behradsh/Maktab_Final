@@ -383,6 +383,9 @@ class HomeView(generics.ListAPIView):
         context['request'] = self.request
         return context
 
+class HomeTemplate(TemplateView):
+    template_name = 'main/home_test.html'
+
 
 
 def get_user_store(user):
@@ -619,5 +622,23 @@ class CustomerAddressEditTemplate(TemplateView):
 class CustomerAddressCreateTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_create_address.html"
 
+class CustomerRegisterTemplate(TemplateView):
+    template_name = "auth/Customer_register.html"
 
+class SellerRegisterTemplate(TemplateView):
+    template_name = "auth/Seller_register.html"
 
+class SellerLoginTemplate(TemplateView):
+    template_name = "auth/seller_login_username.html"
+
+class SellerDashboardTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard.html"
+
+class SellerDashboardChangePassTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_change_pass.html"
+
+class SellerDashboardOrdersTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_orders.html"
+
+class SellerDashboardOrdersEditTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_orders_edit.html"

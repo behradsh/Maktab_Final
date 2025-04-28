@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from core_app.custom_permissions import *
+from django.views.generic import TemplateView
 from users_app.models import CustomUser
 from .serializers import (StoreSerializer,
                           StoreEmployeeCreateSerializer,
@@ -27,7 +28,7 @@ def get_user_store(user):
 
 
 class SellerStoreRetrieveView(generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
+    permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
     serializer_class = StoreSerializer
 
     def get_object(self):
@@ -38,11 +39,12 @@ class SellerStoreRetrieveView(generics.RetrieveAPIView):
         return Response({
             'id': store.id,
             'name': store.name,
-            'address': store.address
+            'address': store.address,
+            'city':store.city,
         })
 
 class SellerStoreUpdateView(generics.UpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
+    permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
     serializer_class = StoreSerializer
 
 
@@ -52,7 +54,7 @@ class SellerStoreUpdateView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         store = self.get_object()
         data = request.data  # Using request.data instead of json.loads(request.body)
-        allowed_fields = ['name', 'address']
+        allowed_fields = ['name', 'address','city']
 
         for key, value in data.items():
             if key not in allowed_fields:
@@ -65,7 +67,8 @@ class SellerStoreUpdateView(generics.UpdateAPIView):
         return Response({
             'id': store.id,
             'name': store.name,
-            'address': store.address
+            'address': store.address,
+            'city': store.city,
         })
 
 class StoreEmployeeCreateView(generics.CreateAPIView):
@@ -73,18 +76,18 @@ class StoreEmployeeCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
 
     def get_queryset(self):
-        return StoreEmployee.objects.filter(store__owner=self.request.user)
+        return StoreEmployee.objects.filter(store_id__owner=self.request.user)
 
     def perform_create(self, serializer):
         store = get_user_store(self.request.user)
-        serializer.save(store=store)
+        serializer.save(store_id=store)
 
 class StoreEmployeeListView(generics.ListAPIView):
-    serializer_class = StoreEmployeeCreateSerializer
+    serializer_class = StoreEmployeeSerializer
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
 
     def get_queryset(self):
-        return StoreEmployee.objects.filter(store__owner=self.request.user)
+        return StoreEmployee.objects.filter(store_id__owner=self.request.user)
 
 class StoreEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
@@ -137,3 +140,17 @@ class StoreEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
                 status=status.HTTP_400_BAD_REQUEST
             )
         return super().handle_exception(exc)
+
+class StoreDetailTemplate(TemplateView):
+    template_name = 'dashboards/seller_dashboard_store.html'
+
+class StoreEmployeeTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_employees.html"
+
+class StoreEmployeeCreateTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_employees_create.html"
+
+class StoreEmployeeEditTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_employees_edit.html"
+
+

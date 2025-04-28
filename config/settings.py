@@ -76,8 +76,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'log_request_id.middleware.RequestIDMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'config.middleware.UserTypeMiddleware',
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -315,4 +313,4 @@ LOGGING = {
     },
 }
 logging.config.dictConfig(LOGGING) # Finally replace our config in python logging
-LOGIN_URL = 'token_obtain_pair'
+# LOGIN_URL = 'token_obtain_pair'

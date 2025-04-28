@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from users_app.views import (LoginTemplateView)
+from users_app.views import (LoginTemplateView,SellerLoginTemplate)
 from rest_framework.routers import DefaultRouter
 from django.conf.urls.i18n import i18n_patterns
 # from products_app.views import (CategoryView,ProductView)
@@ -31,7 +31,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, Toke
 urlpatterns=i18n_patterns(
     path('admin/', admin.site.urls),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('login/', LoginTemplateView.as_view(), name='login_template'),
+    path('login/customer/', LoginTemplateView.as_view(), name='login_customer'),
+    path('login/seller/', SellerLoginTemplate.as_view(), name='login_seller'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('api/', include(router.urls)),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
