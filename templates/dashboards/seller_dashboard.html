@@ -34,7 +34,7 @@
                         <li><a class="dropdown-item" href="#!">Settings</a></li>
                         <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">Logout</a></li>
+                        <li><a class="dropdown-item" id="logout_btn" href="#!">Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -69,13 +69,17 @@
                             </div>
                             <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
                             <div class="sb-sidenav-menu-heading"></div>
-                            <a class="nav-link">
+                            <a class="nav-link" id="seller_products">
                                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                                
+                                Products List
                             </a>
-                            <a class="nav-link">
+                            <a class="nav-link" id="seller_create_product">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                
+                                Add Products
+                            </a>
+                            <a class="nav-link" id="seller_categories">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                Categories
                             </a>
                         </div>
                     </div>
@@ -217,6 +221,41 @@
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
         </script>
         <script>
+            document.getElementById('logout_btn').addEventListener('click', async function(e) {
+              e.preventDefault();
+          
+              const accessToken = localStorage.getItem('accessToken');
+              if (!accessToken) {
+                  // Already logged out or no token
+                  window.location.href = '/en/login/';
+                  return;
+              }
+          
+              try {
+                  const response = await fetch('http://127.0.0.1:8000/en/api/logout/', {
+                      method: 'POST',
+                      headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                      }
+                  });
+          
+                  // Remove tokens from localStorage
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+          
+                  // Redirect to login page (or homepage)
+                  window.location.href = `{% url 'home_page'%}`;
+              } catch (error) {
+                  // Even if error, clear tokens and redirect
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+                  window.location.href = `{% url 'home_page'%}`;
+              }
+          });
+      </script>
+  
+        <script>
             document.getElementById('seller_store').addEventListener('click', function(e) {
               // Prevent the default link behavior
               e.preventDefault();
@@ -272,6 +311,48 @@
                 window.location.href = `{% url 'change_password_seller' %}`;
             });
           </script>
+          <script>
+
+            document.getElementById('seller_products').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'product_list' %}`;
+          });
+        </script>
+        <script>
+
+            document.getElementById('seller_create_product').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'create_product' %}`;
+          });
+        </script>
+        <script>
+
+            document.getElementById('seller_categories').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'category_list' %}`;
+          });
+        </script>
           
     </body>
 </html>

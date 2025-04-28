@@ -43,9 +43,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ['id', 'store', 'store_id', 'total_amount', 'status', 'created_at', 'shipping_address',
-                 'shipping_address_id', 'items','created_at_shamsi', 'updated_at_shamsi']
-        read_only_fields = ['total_amount', 'status', 'created_at']
+        fields = ['id','customer', 'store', 'store_id', 'total_amount','address', 'status', 'created_at', 'shipping_address',
+                 'shipping_address_id', 'items','created_at_shamsi', 'updated_at_shamsi','discount']
+        read_only_fields = ['created_at']
 
     def get_created_at_shamsi(self, obj):
         return obj.created_at_shamsi

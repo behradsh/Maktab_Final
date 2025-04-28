@@ -31,11 +31,11 @@ class CustomerCommentsListTemplate(TemplateView):
 
 class SellerProductListCreateView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticated,IsSellerOwner]
+    permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
 
     def get_queryset(self):
         store = Store.objects.get(owner=self.request.user)
-        return Product.objects.filter(store=store)
+        return Product.objects.filter(store=store).order_by('-created_at')
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -46,7 +46,7 @@ class SellerProductListCreateView(generics.ListCreateAPIView):
 
 class SellerProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticated,IsSellerOwner]
+    permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
 
     def get_queryset(self):
         store = Store.objects.get(owner=self.request.user)
@@ -70,12 +70,12 @@ class SellerProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated,IsSellerOwner]
+    permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
 
 class CategoryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated,IsSellerOwner]
+    permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
 
 class ProductListHomeView(generics.ListAPIView):
     queryset = Product.objects.all()
@@ -95,3 +95,19 @@ class CategoryListHomeView(generics.ListAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+
+class SellerDashboardCreateProductTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_products_add.html"
+
+class SellerDashboardListProductTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_products.html"
+
+class SellerDashboardEditProductTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_products_edit.html"
+
+class SellerCategoryListTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_category.html"
+class SellerCategoryUpdateTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_category_edit.html"
+class SellerCategoryCreateTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_category_add.html"

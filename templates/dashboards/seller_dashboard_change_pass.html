@@ -34,7 +34,7 @@
                         <li><a class="dropdown-item" href="#!">Settings</a></li>
                         <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">Logout</a></li>
+                        <li><a class="dropdown-item" id="logout_btn" href="#!">Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -45,7 +45,7 @@
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Home</div>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{% url 'seller_dashboard' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
@@ -87,8 +87,8 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Dashboard</h1>
-                        <section id='profile_form'>
+                        <h1 class="mt-4">Change Password</h1>
+                        <section id='change_password_section'>
 
                         </section>
                         
@@ -142,44 +142,6 @@
             function populateProfileForm(user) {
                 const name_of_profile = document.getElementById('login_user')
                 name_of_profile.innerHTML=`Logged in as:${user.username}`
-                const profileForm = document.getElementById('profile_form');
-                profileForm.innerHTML = `
-                    <form id="userProfileForm">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" value="${user.username}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="first_name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" value="${user.first_name}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="last_name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" value="${user.last_name}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="${user.email}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <select class="form-control" id="gender" name="gender">
-                                <option value="true" ${user.gender ? 'selected' : ''}>Male</option>
-                                <option value="false" ${!user.gender ? 'selected' : ''}>Female</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="profile_img" class="form-label">Profile Image</label>
-                            <img src="${user.profile_img}" alt="Profile Image" class="img-thumbnail mb-2" style="max-width: 150px;" />
-                            <input type="file" class="form-control" id="profile_img" name="profile_img" />
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="updateUserProfile()">Update Profile</button>
-                    </form>
-                `;
             }
         
             // Function to update user profile
@@ -216,6 +178,105 @@
             // Fetch user profile on page load
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
         </script>
+        <script>
+            // Function to populate the change password form
+            function populateChangePasswordForm() {
+                const changePasswordSection = document.getElementById('change_password_section');
+                changePasswordSection.innerHTML = `
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label for="old_password" class="form-label">Old Password</label>
+                            <input type="password" class="form-control" id="old_password" name="old_password" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password2" class="form-label">Repeat New Password</label>
+                            <input type="password" class="form-control" id="new_password2" name="new_password2" required />
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="submitChangePassword()">Change Password</button>
+                    </form>
+                `;
+            }
+        
+            // Function to submit the change password form
+            async function submitChangePassword() {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    console.error('Access token is missing.');
+                    return;
+                }
+        
+                const form = document.getElementById('changePasswordForm');
+                const formData = {
+                    old_password: form.old_password.value,
+                    new_password: form.new_password.value,
+                    new_password2: form.new_password2.value
+                };
+        
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/en/api/seller/dashboard/profile/change_password/', {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+        
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.old_password || errorData.new_password || 'Failed to change password.');
+                    }
+        
+                    alert('Password changed successfully!');
+                    window.location.href = `{% url 'seller_dashboard' %}`; // Redirect to the profile page
+                } catch (error) {
+                    console.error('Error changing password:', error);
+                    alert(error.message);
+                }
+            }
+        
+            // Populate the change password form on page load
+            document.addEventListener('DOMContentLoaded', populateChangePasswordForm);
+        </script>
+        <script>
+            document.getElementById('logout_btn').addEventListener('click', async function(e) {
+              e.preventDefault();
+          
+              const accessToken = localStorage.getItem('accessToken');
+              if (!accessToken) {
+                  // Already logged out or no token
+                  window.location.href = '/en/login/';
+                  return;
+              }
+          
+              try {
+                  const response = await fetch('http://127.0.0.1:8000/en/api/logout/', {
+                      method: 'POST',
+                      headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                      }
+                  });
+          
+                  // Remove tokens from localStorage
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+          
+                  // Redirect to login page (or homepage)
+                  window.location.href = `{% url 'home_page'%}`;
+              } catch (error) {
+                  // Even if error, clear tokens and redirect
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+                  window.location.href = `{% url 'home_page'%}`;
+              }
+          });
+      </script>
+  
         <script>
             document.getElementById('seller_store').addEventListener('click', function(e) {
               // Prevent the default link behavior

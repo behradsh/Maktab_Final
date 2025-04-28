@@ -34,7 +34,7 @@
                         <li><a class="dropdown-item" href="#!">Settings</a></li>
                         <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">Logout</a></li>
+                        <li><a class="dropdown-item" id="logout_btn" href="#!">Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -45,7 +45,7 @@
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Home</div>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{% url 'seller_dashboard' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
@@ -87,9 +87,11 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Dashboard</h1>
-                        <section id='profile_form'>
-
+                        <h1 class="mt-4">List of Orders</h1>
+                        <section id="orders_list_section">
+                            <ul id="ordersList" class="list-group">
+                                <!-- Orders will be dynamically added here -->
+                            </ul>
                         </section>
                         
                         <div class="row">
@@ -142,44 +144,6 @@
             function populateProfileForm(user) {
                 const name_of_profile = document.getElementById('login_user')
                 name_of_profile.innerHTML=`Logged in as:${user.username}`
-                const profileForm = document.getElementById('profile_form');
-                profileForm.innerHTML = `
-                    <form id="userProfileForm">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" value="${user.username}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="first_name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" value="${user.first_name}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="last_name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" value="${user.last_name}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="${user.email}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <select class="form-control" id="gender" name="gender">
-                                <option value="true" ${user.gender ? 'selected' : ''}>Male</option>
-                                <option value="false" ${!user.gender ? 'selected' : ''}>Female</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="profile_img" class="form-label">Profile Image</label>
-                            <img src="${user.profile_img}" alt="Profile Image" class="img-thumbnail mb-2" style="max-width: 150px;" />
-                            <input type="file" class="form-control" id="profile_img" name="profile_img" />
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="updateUserProfile()">Update Profile</button>
-                    </form>
-                `;
             }
         
             // Function to update user profile
@@ -216,6 +180,109 @@
             // Fetch user profile on page load
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
         </script>
+        <script>
+            // Function to fetch orders and populate the list
+            async function fetchOrders() {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    alert('Access token is missing. Please log in again.');
+                    return;
+                }
+        
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/en/api/seller/dashboard/orders/', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch orders.');
+                    }
+        
+                    const orders = await response.json();
+                    populateOrdersList(orders);
+                } catch (error) {
+                    console.error('Error fetching orders:', error);
+                    alert(error.message);
+                }
+            }
+        
+            // Function to populate the orders list
+            function populateOrdersList(orders) {
+                const ordersList = document.getElementById('ordersList');
+                ordersList.innerHTML = ''; // Clear the list
+        
+                orders.forEach(order => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+        
+                    // Order details
+                    const orderDetails = document.createElement('div');
+                    orderDetails.innerHTML = `
+                        <strong>Order ID:</strong> ${order.id} <br>
+                        <strong>Customer ID:</strong> ${order.customer} <br>
+                        <strong>Created Date:</strong> ${order.created_at_shamsi} <br>
+                        <strong>Total Amount:</strong> ${order.total_amount} <br>
+                        <strong>Discount:</strong> ${order.discount}% <br>
+                        <strong>Address:</strong> ${order.address} <br>
+                        <strong>Status:</strong> ${order.status}
+                    `;
+                    listItem.appendChild(orderDetails);
+        
+                    // Edit button
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'Edit';
+                    editButton.className = 'btn btn-primary btn-sm';
+                    editButton.addEventListener('click', () => {
+                        window.location.href = `http://127.0.0.1:8000/en/seller/dashboard/orders/${order.id}/`;
+                    });
+                    listItem.appendChild(editButton);
+        
+                    ordersList.appendChild(listItem);
+                });
+            }
+        
+            // Fetch orders on page load
+            document.addEventListener('DOMContentLoaded', fetchOrders);
+        </script>
+        <script>
+            document.getElementById('logout_btn').addEventListener('click', async function(e) {
+              e.preventDefault();
+          
+              const accessToken = localStorage.getItem('accessToken');
+              if (!accessToken) {
+                  // Already logged out or no token
+                  window.location.href = '/en/login/';
+                  return;
+              }
+          
+              try {
+                  const response = await fetch('http://127.0.0.1:8000/en/api/logout/', {
+                      method: 'POST',
+                      headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                      }
+                  });
+          
+                  // Remove tokens from localStorage
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+          
+                  // Redirect to login page (or homepage)
+                  window.location.href = `{% url 'home_page'%}`;
+              } catch (error) {
+                  // Even if error, clear tokens and redirect
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+                  window.location.href = `{% url 'home_page'%}`;
+              }
+          });
+      </script>
+  
         <script>
             document.getElementById('seller_store').addEventListener('click', function(e) {
               // Prevent the default link behavior

@@ -21,7 +21,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-        read_only_fields = ['created_at_shamsi', 'updated_at_shamsi']
+        read_only_fields = ['created_at_shamsi', 'updated_at_shamsi','store']
 
     def get_created_at_shamsi(self, obj):
         return obj.created_at_shamsi

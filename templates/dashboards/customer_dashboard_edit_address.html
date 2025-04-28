@@ -34,7 +34,7 @@
                         <li><a class="dropdown-item" href="#!">Settings</a></li>
                         <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">Logout</a></li>
+                        <li><a class="dropdown-item" id="logout_btn" href="#!">Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -264,6 +264,41 @@
             // Fetch the address data and populate the form on page load
             document.addEventListener('DOMContentLoaded', fetchAddressData);
         </script>
+        <script>
+            document.getElementById('logout_btn').addEventListener('click', async function(e) {
+              e.preventDefault();
+          
+              const accessToken = localStorage.getItem('accessToken');
+              if (!accessToken) {
+                  // Already logged out or no token
+                  window.location.href = '/en/login/';
+                  return;
+              }
+          
+              try {
+                  const response = await fetch('http://127.0.0.1:8000/en/api/logout/', {
+                      method: 'POST',
+                      headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                      }
+                  });
+          
+                  // Remove tokens from localStorage
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+          
+                  // Redirect to login page (or homepage)
+                  window.location.href = `{% url 'home_page'%}`;
+              } catch (error) {
+                  // Even if error, clear tokens and redirect
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+                  window.location.href = `{% url 'home_page'%}`;
+              }
+          });
+      </script>
+  
         <script>
             document.getElementById('customer_orders').addEventListener('click', function(e) {
               // Prevent the default link behavior

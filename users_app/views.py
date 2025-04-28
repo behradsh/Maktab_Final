@@ -438,7 +438,7 @@ class SellerProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
 
 
 class SellerOrderListView(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticated, IsSellerOrNot, IsSellerOwner, IsSellerManager]
+    permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager,]
     serializer_class = OrderSerializer
 
     def get_queryset(self):
@@ -462,8 +462,8 @@ class SellerOrderListView(generics.ListCreateAPIView):
         return context
 
 
-class SellerOrderUpdateView(generics.UpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated, IsSellerOrNot, IsSellerOwner, IsSellerManager]
+class SellerOrderUpdateView(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
     serializer_class = OrderSerializer
 
     def get_queryset(self):
