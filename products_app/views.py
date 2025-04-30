@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
+from django.http import JsonResponse
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework import generics,permissions
 from .models import (Category,Product,Comment)
 from .serializers import (CategorySerializer,ProductSerializer,CommentSerializer)
 from core_app.custom_permissions import *
+from core_app.authentication import CsrfExemptSessionAuthentication
 from store_app.models import Store
 from rest_framework import viewsets
 from drf_spectacular.utils import extend_schema
@@ -87,6 +90,18 @@ class ProductListHomeView(generics.ListAPIView):
         context['request'] = self.request
         return context
 
+class ProductDetailsView(generics.RetrieveAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = []
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+
+
 class CategoryListHomeView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -95,6 +110,42 @@ class CategoryListHomeView(generics.ListAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+
+class CategoryDetailView(generics.RetrieveAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = []
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+
+
+def search_products(request):
+    query = request.GET.get('q', '')  # Search Query
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) | Q(brand__icontains=query)
+        )
+    else:
+        products = Product.objects.all()
+
+    results = [
+        {
+            'id': product.id,
+            'name': product.name,
+            'brand': product.brand,
+            'price': product.price,
+            'image': product.image.url if product.image else None,
+        }
+        for product in products
+    ]
+    return JsonResponse({'results': results})
+
+
+class ProductPageTemplate(TemplateView):
+    template_name = "main/products_page.html"
 
 class SellerDashboardCreateProductTemplate(TemplateView):
     template_name = "dashboards/seller_dashboard_products_add.html"

@@ -68,15 +68,19 @@
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                            <div class="sb-sidenav-menu-heading"></div>
-                            <a class="nav-link">
-                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                                
-                            </a>
-                            <a class="nav-link">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                
-                            </a>
+                                <div class="sb-sidenav-menu-heading"></div>
+                                <a class="nav-link" id="seller_products">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                    Products List
+                                </a>
+                                <a class="nav-link" id="seller_create_product">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Add Products
+                                </a>
+                                <a class="nav-link" id="seller_categories">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                    Categories
+                                </a>
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">
@@ -87,9 +91,22 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Dashboard</h1>
-                        <section id='profile_form'>
-
+                        <h1 class="mt-4">Create Category</h1>
+                        <section id="create_category_section">
+                            <form id="createCategoryForm">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Category Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="parent" class="form-label">Parent Category</label>
+                                    <select class="form-select" id="parent" name="parent">
+                                        <option value="">No Parent</option>
+                                        <!-- Parent categories will be dynamically added here -->
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create Category</button>
+                            </form>
                         </section>
                         
                         <div class="row">
@@ -142,44 +159,6 @@
             function populateProfileForm(user) {
                 const name_of_profile = document.getElementById('login_user')
                 name_of_profile.innerHTML=`Logged in as:${user.username}`
-                const profileForm = document.getElementById('profile_form');
-                profileForm.innerHTML = `
-                    <form id="userProfileForm">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" value="${user.username}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="first_name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" value="${user.first_name}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="last_name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" value="${user.last_name}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="${user.email}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <select class="form-control" id="gender" name="gender">
-                                <option value="true" ${user.gender ? 'selected' : ''}>Male</option>
-                                <option value="false" ${!user.gender ? 'selected' : ''}>Female</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="profile_img" class="form-label">Profile Image</label>
-                            <img src="${user.profile_img}" alt="Profile Image" class="img-thumbnail mb-2" style="max-width: 150px;" />
-                            <input type="file" class="form-control" id="profile_img" name="profile_img" />
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="updateUserProfile()">Update Profile</button>
-                    </form>
-                `;
             }
         
             // Function to update user profile
@@ -215,6 +194,88 @@
         
             // Fetch user profile on page load
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
+        </script>
+        <script>
+            // Fetch parent categories and populate the dropdown
+            async function fetchParentCategories() {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    alert('Access token is missing. Please log in again.');
+                    return;
+                }
+        
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/en/api/seller/dashboard/category/', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch parent categories.');
+                    }
+        
+                    const categories = await response.json();
+                    const parentSelect = document.getElementById('parent');
+        
+                    categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        parentSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error fetching parent categories:', error);
+                    alert(error.message);
+                }
+            }
+        
+            // Handle form submission to create a category
+            document.getElementById('createCategoryForm').addEventListener('submit', async function (e) {
+                e.preventDefault(); // Prevent default form submission
+        
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    alert('Access token is missing. Please log in again.');
+                    return;
+                }
+        
+                const form = e.target;
+                const formData = new FormData(form);
+        
+                // Convert form data to JSON
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+        
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/en/api/seller/dashboard/category/', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+        
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || JSON.stringify(errorData));
+                    }
+        
+                    alert('Category created successfully!');
+                    form.reset(); // Reset the form after successful submission
+                } catch (error) {
+                    console.error('Error creating category:', error);
+                    alert(error.message);
+                }
+            });
+        
+            // Fetch parent categories on page load
+            document.addEventListener('DOMContentLoaded', fetchParentCategories);
         </script>
         <script>
             document.getElementById('logout_btn').addEventListener('click', async function(e) {
@@ -307,6 +368,48 @@
                 window.location.href = `{% url 'change_password_seller' %}`;
             });
           </script>
+          <script>
+
+            document.getElementById('seller_products').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'product_list' %}`;
+          });
+        </script>
+        <script>
+
+            document.getElementById('seller_create_product').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'create_product' %}`;
+          });
+        </script>
+        <script>
+
+            document.getElementById('seller_categories').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'category_list' %}`;
+          });
+        </script>
           
     </body>
 </html>

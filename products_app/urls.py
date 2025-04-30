@@ -6,11 +6,16 @@ from .views import (SellerProductListCreateView,SellerProductRetrieveUpdateDestr
                     CustomerCommentsListTemplate,SellerDashboardListProductTemplate,
                     SellerDashboardCreateProductTemplate,SellerDashboardEditProductTemplate,
                     SellerCategoryCreateTemplate,SellerCategoryUpdateTemplate,
-                    SellerCategoryListTemplate,)
+                    SellerCategoryListTemplate,ProductPageTemplate,ProductDetailsView,CategoryDetailView,
+                    search_products)
 
 urlpatterns = [
+    path('api/search/', search_products, name='search_products'),
     path('api/products/', ProductListHomeView.as_view(),name='product_list_home'),
+    path('api/products/<int:pk>/', ProductDetailsView.as_view(),name='product_detail_api'),
+    path('product/<int:pk>/', ProductPageTemplate.as_view(),name='product_page'),
     path('api/category/', CategoryListHomeView.as_view(),name='category_list_home'),
+    path('api/category/<int:pk>/', CategoryDetailView.as_view(),name='category_detail_api'),
     path('api/seller/dashboard/product/', SellerProductListCreateView.as_view(),name='product_list_api'),
     path('seller/dashboard/product/create/', SellerDashboardCreateProductTemplate.as_view(),name='create_product'),
     path('seller/dashboard/product/', SellerDashboardListProductTemplate.as_view(),name='product_list'),

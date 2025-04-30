@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
+        <meta name="csrf-token" content="{{ csrf_token }}">
         <title>Dashboard</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
         <link href="{% static 'dashboards/css/styles.css' %}" rel="stylesheet" />
@@ -91,10 +92,17 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Categories</h1>
-                        <section id='profile_form'>
-
-                        </section>
+                        <h1 class="mt-4">Category List</h1>
+                        <div class="container-fluid px-4">
+                            <section id="category_section">
+                                <!-- Button to redirect to create employee page -->
+                                <button id="createCategoryButton" class="btn btn-primary mb-3">Create Employee</button>
+                            
+                                <!-- Unordered list to display employees -->
+                                <ul id="categoryList" class="list-group">
+                                    <!-- Employee items will be dynamically added here -->
+                                </ul>
+                            </section>
                         
                         <div class="row">
                             
@@ -183,6 +191,118 @@
             // Fetch user profile on page load
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
         </script>
+        <script>
+            // Redirect to the create employee page
+            document.getElementById('createCategoryButton').addEventListener('click', function () {
+                window.location.href = "{% url 'category_create' %}";
+            });
+        
+            // Fetch and display the list of employees
+            async function fetchCategories() {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    console.error('Access token is missing.');
+                    return;
+                }
+        
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/en/api/seller/dashboard/category/', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch employees.');
+                    }
+        
+                    const categories = await response.json();
+                    populateCategoryList(categories);
+                } catch (error) {
+                    console.error('Error fetching categories:', error);
+                }
+            }
+        
+            // Populate the category list
+            function populateCategoryList(categories) {
+                const categoryList = document.getElementById('categoryList');
+                categoryList.innerHTML = ''; // Clear the list
+        
+                categories.forEach(category => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+        
+                    // Category name
+                    const name = document.createElement('span');
+                    name.textContent = `name: ${category.name}`;
+                    listItem.appendChild(name);
+
+                    // Parent button
+                    const ParentButton = document.createElement('button');
+                    ParentButton.textContent = category.parent ? `Parent: ${category.parent}` : 'No Parent';
+                    ParentButton.className ='btn btn-success btn-sm';
+                    listItem.appendChild(ParentButton);
+        
+                    // Number of Products for each Category
+                    const nums = document.createElement('span');
+                    nums.textContent = `Products No's: ${category.num_of_products}`;
+                    listItem.appendChild(nums);
+        
+                    // Edit button
+                    const category_id = category.id
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'Edit';
+                    editButton.className = 'btn btn-warning btn-sm ms-2';
+                    
+
+                    editButton.addEventListener('click', () => {
+                        window.location.href = `http://127.0.0.1:8000/en/seller/dashboard/category/${category_id}/`;
+                    });
+                    listItem.appendChild(editButton);
+        
+                    // Delete button
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.className = 'btn btn-danger btn-sm ms-2';
+                    function getCSRFToken() {
+                        return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    }
+                    
+                    // Delete button event listener
+                    deleteButton.addEventListener('click', async () => {
+                        if (confirm('Are you sure you want to delete this category?')) {
+                            try {
+                                const response = await fetch(`http://127.0.0.1:8000/en/api/seller/dashboard/category/${category.id}/`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                                        'X-CSRFToken': getCSRFToken(), // Include the CSRF token here
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                    
+                                if (!response.ok) {
+                                    throw new Error('Failed to delete category.');
+                                }
+                    
+                                alert('Category deleted successfully!');
+                                fetchCategories(); // Refresh the list
+                            } catch (error) {
+                                console.error('Error deleting category:', error);
+                                alert(error.message);
+                            }
+                        }
+                    });
+                    listItem.appendChild(deleteButton);
+        
+                    categoryList.appendChild(listItem);
+                });
+            }
+        // Fetch categories on page load
+        document.addEventListener('DOMContentLoaded', fetchCategories);
+    </script>
         <script>
             document.getElementById('logout_btn').addEventListener('click', async function(e) {
               e.preventDefault();

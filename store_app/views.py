@@ -141,6 +141,32 @@ class StoreEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
             )
         return super().handle_exception(exc)
 
+
+class StoreListView(generics.ListAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = StoreSerializer
+
+    def get_queryset(self):
+        stores = Store.objects.all()
+        return stores
+
+class StoreDetailView(generics.RetrieveAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = StoreSerializer
+
+    def get_queryset(self):
+        stores = Store.objects.all()
+        return stores
+
+
+
+
+class StoreDetailsPageTemplate(TemplateView):
+    template_name = 'main/stores_detail.html'
+
+class StoreListTemplate(TemplateView):
+    template_name = 'main/stores_page.html'
+
 class StoreDetailTemplate(TemplateView):
     template_name = 'dashboards/seller_dashboard_store.html'
 

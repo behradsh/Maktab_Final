@@ -37,6 +37,11 @@ class Category(models.Model):
             created_shamsi = jdatetime.datetime.fromgregorian(datetime=self.created_at).strftime('%Y-%m-%d %H:%M:%S')
             return created_shamsi
         return None
+    def num_of_products(self):
+        category = Category.objects.get(pk=self.pk)
+        num_of_products = Product.objects.filter(category=category).count()
+        num_of_sub_products = Product.objects.filter(category__parent=category).count()
+        return (num_of_products+num_of_sub_products)
 
 
 class Product(models.Model):

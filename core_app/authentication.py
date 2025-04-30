@@ -1,5 +1,6 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
+from rest_framework.authentication import SessionAuthentication
 from django.db.models import Q
 
 CustomUser = get_user_model()
@@ -21,3 +22,7 @@ class PhoneBackend(ModelBackend):
                 return user
         except CustomUser.DoesNotExist:
             return None
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return

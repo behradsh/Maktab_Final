@@ -68,15 +68,19 @@
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                            <div class="sb-sidenav-menu-heading"></div>
-                            <a class="nav-link">
-                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                                
-                            </a>
-                            <a class="nav-link">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                
-                            </a>
+                                <div class="sb-sidenav-menu-heading"></div>
+                                <a class="nav-link" id="seller_products">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                    Products List
+                                </a>
+                                <a class="nav-link" id="seller_create_product">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Add Products
+                                </a>
+                                <a class="nav-link" id="seller_categories">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                    Categories
+                                </a>
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">
@@ -339,6 +343,48 @@
                 window.location.href = `{% url 'change_password_seller' %}`;
             });
           </script>
+          <script>
+
+            document.getElementById('seller_products').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'product_list' %}`;
+          });
+        </script>
+        <script>
+
+            document.getElementById('seller_create_product').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'create_product' %}`;
+          });
+        </script>
+        <script>
+
+            document.getElementById('seller_categories').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'category_list' %}`;
+          });
+        </script>
           
     </body>
 </html>
