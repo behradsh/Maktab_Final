@@ -144,6 +144,8 @@ def search_products(request):
     return JsonResponse({'results': results})
 
 
+
+
 class ProductPageTemplate(TemplateView):
     template_name = "main/products_page.html"
 

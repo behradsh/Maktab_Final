@@ -29,7 +29,7 @@ class Category(models.Model):
         while k is not None:
             full_path.append(k.name)
             k = k.parent
-        return ' → '.join(full_path[::-1])  # Shows full path like: Electronics → Phones → Smartphones
+        return ' > '.join(full_path[::-1])  # Show path like: Electronics > Phones
 
     @property
     def created_at_shamsi(self):

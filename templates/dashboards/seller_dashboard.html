@@ -201,7 +201,7 @@
                     const response = await fetch('http://127.0.0.1:8000/en/api/customer/dashboard/profile/', {
                         method: 'PATCH',
                         headers: {
-                            'Authorization': `Bearer ${aseller_storeccessToken}`
+                            'Authorization': `Bearer ${accessToken}`
                         },
                         body: formData
                     });

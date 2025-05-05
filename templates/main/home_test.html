@@ -4,6 +4,8 @@
 <html lang="en">
   <head>
     <title>FoodMart</title>
+    <script src="{% static 'main/js/jquery-1.11.0.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,41 +88,19 @@
       </div>
       <div class="offcanvas-body">
         <div class="order-md-last">
-          <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-primary">Your cart</span>
-            <span class="badge bg-primary rounded-pill">3</span>
-          </h4>
-          <ul class="list-group mb-3">
-            <li class="list-group-item d-flex justify-content-between lh-sm">
-              <div>
-                <h6 class="my-0">Growers cider</h6>
-                <small class="text-body-secondary">Brief description</small>
-              </div>
-              <span class="text-body-secondary">$12</span>
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-primary">Your cart</span>
+                <span id="cart_counts" class="badge bg-primary rounded-pill">0</span>
+            </h4>
+            <ul id="cart_items" class="list-group mb-3">
+                <!-- Cart items will be dynamically inserted here -->
+            </ul>
+            <li id="cart_total_amount" class="list-group-item d-flex justify-content-between">
+                <!-- data will add dynamically -->
             </li>
-            <li class="list-group-item d-flex justify-content-between lh-sm">
-              <div>
-                <h6 class="my-0">Fresh grapes</h6>
-                <small class="text-body-secondary">Brief description</small>
-              </div>
-              <span class="text-body-secondary">$8</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between lh-sm">
-              <div>
-                <h6 class="my-0">Heinz tomato ketchup</h6>
-                <small class="text-body-secondary">Brief description</small>
-              </div>
-              <span class="text-body-secondary">$5</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Total (USD)</span>
-              <strong>$20</strong>
-            </li>
-          </ul>
-  
-          <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+            <button id="check_out_btn" class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
         </div>
-      </div>
+    </div>
     </div>
     
     <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasSearch" aria-labelledby="Search">
@@ -209,7 +189,7 @@
             <div class="cart text-end d-none d-lg-block dropdown">
               <button class="border-0 bg-transparent d-flex flex-column gap-2 lh-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart">
                 <span class="fs-6 text-muted dropdown-toggle">Your Cart</span>
-                <span class="cart-total fs-5 fw-bold">$1290.00</span>
+                <span id="cart_total_show" class="cart-total fs-5 fw-bold"></span>
               </button>
             </div>
           </div>
@@ -361,14 +341,14 @@
                                     <svg width="16" height="16"><use xlink:href="#minus"></use></svg>
                                   </button>
                               </span>
-                              <input type="text" id="quantity" name="quantity" class="form-control input-number" value="1">
+                              <input type="text" id="quantity" name="quantity" class="form-control input-number quantity-input" value="1">
                               <span class="input-group-btn">
                                   <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus">
                                       <svg width="16" height="16"><use xlink:href="#plus"></use></svg>
                                   </button>
                               </span>
                           </div>
-                          <a href="#" class="nav-link">Add to Cart <iconify-icon icon="uil:shopping-cart"></a>
+                          <a href="#" id="addtocart" class="nav-link" data-product-id="1">Add to Cart <iconify-icon icon="uil:shopping-cart"></a>
                         </div>
                       </div>
                     </div>
@@ -475,76 +455,115 @@
         </div>
       </div>
     </div>
-    <script src="{% static 'main/js/jquery-1.11.0.min.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="{% static 'main/js/plugins.js' %}"></script>
     <script src="{% static 'main/js/script.js' %}"></script>
-    <script> 
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('http://127.0.0.1:8000/en/api/products/')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Function to initialize quantity controls for all product items
+        function initProductQty() {
+            // Select all product quantity input groups
+            const qtyGroups = document.querySelectorAll('.product-qty');
+    
+            qtyGroups.forEach(group => {
+                const minusBtn = group.querySelector('.quantity-left-minus');
+                const plusBtn = group.querySelector('.quantity-right-plus');
+                const input = group.querySelector('.quantity-input');
+    
+                // Ensure default value is 1 if not set or invalid
+                if (!input.value || isNaN(parseInt(input.value))) {
+                    input.value = 1;
+                }
+    
+                // Handle minus button click
+                minusBtn.addEventListener('click', function() {
+                    let currentValue = parseInt(input.value);
+                    if (currentValue > 1) {
+                        input.value = currentValue - 1;
                     }
-                    return response.json();
-                })
-                .then(products => {
-                    console.log('Products received:', products); // Debug: check what data you're receiving
-                    const container = document.getElementById('product_grid');
-                    if (!container) {
-                        console.error('Product grid container not found');
-                        return;
-                    }
-                    
-                    products.forEach(product => {
-                        // Use image_url and add a fallback for missing images
-                        const imageUrl = product.image || "{% static 'main/images/thumb-avocado.png' %}";
-                        
-                        container.innerHTML += `
-                            <div class="col">
-                                <div class="product-item">
-                                    <a href="#" class="btn-wishlist"><svg width="24" height="24"><use xlink:href="#heart"></use></svg></a>
-                                    <figure>
-                                        <a href="product/${product.id}/" title="${product.name}">
-                                            <img src="${imageUrl}" class="tab-image" alt="${product.name}">
-                                        </a>
-                                    </figure>
-                                    <h3>${product.name}</h3>
-                                    <span class="qty">1 Unit</span><span class="rating"><svg width="24" height="24" class="text-primary"><use xlink:href="#star-solid"></use></svg> 4.5</span>
-                                    <span class="price">$${product.price}</span>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div class="input-group product-qty">
-                                            <span class="input-group-btn">
-                                                <button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus">
-                                                  <svg width="16" height="16"><use xlink:href="#minus"></use></svg>
-                                                </button>
-                                            </span>
-                                            <input type="text" id="quantity" name="quantity" class="form-control input-number" value="1">
-                                            <span class="input-group-btn">
-                                                <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus">
-                                                    <svg width="16" height="16"><use xlink:href="#plus"></use></svg>
-                                                </button>
-                                            </span>
-                                        </div>
-                                        <a href="#" class="nav-link" data-product-id="${product.id}">Add to Cart <iconify-icon icon="uil:shopping-cart"></a>
+                });
+    
+                // Handle plus button click
+                plusBtn.addEventListener('click', function() {
+                    let currentValue = parseInt(input.value);
+                    input.value = currentValue + 1;
+                });
+            });
+        }
+    
+        // Fetch products and initialize quantity controls
+        fetch('http://127.0.0.1:8000/en/api/products/')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(products => {
+                console.log('Products received:', products);
+                const container = document.getElementById('product_grid');
+                if (!container) {
+                    console.error('Product grid container not found');
+                    return;
+                }
+    
+                // Clear existing content (optional, depending on your needs)
+                //container.innerHTML = '';
+    
+                products.forEach(product => {
+                    const imageUrl = product.image || "{% static 'main/images/thumb-avocado.png' %}";
+                    container.innerHTML += `
+                        <div class="col">
+                            <div class="product-item">
+                                <a href="#" class="btn-wishlist"><svg width="24" height="24"><use xlink:href="#heart"></use></svg></a>
+                                <figure>
+                                    <a href="product/${product.id}/" title="${product.name}">
+                                        <img src="${imageUrl}" class="tab-image" alt="${product.name}">
+                                    </a>
+                                </figure>
+                                <h3>${product.name}</h3>
+                                <span class="qty">1 Unit</span><span class="rating"><svg width="24" height="24" class="text-primary"><use xlink:href="#star-solid"></use></svg> 4.5</span>
+                                <span class="price">$${product.price}</span>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="input-group product-qty">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus">
+                                                <svg width="16" height="16"><use xlink:href="#minus"></use></svg>
+                                            </button>
+                                        </span>
+                                        <input type="text" id="quantity" name="quantity" class="form-control input-number quantity-input" value="1">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus">
+                                                <svg width="16" height="16"><use xlink:href="#plus"></use></svg>
+                                            </button>
+                                        </span>
                                     </div>
+                                    <a href="#" id="addtocart" class="nav-link" data-product-id=${product.id}>Add to Cart <iconify-icon icon="uil:shopping-cart"></a>
                                 </div>
                             </div>
-                        `;
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching products:', error);
-                    document.getElementById('product-grid').innerHTML = `
-                        <div class="alert alert-danger">
-                            Failed to load products. Please try again later.
                         </div>
                     `;
                 });
-        });
-    </script>
-    <script> 
+    
+                // Initialize quantity controls for newly added products
+                initProductQty();
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                document.getElementById('product_grid').innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to load products. Please try again later.
+                    </div>
+                `;
+            });
+    
+        // Initialize quantity controls for any static product items
+        initProductQty();
+    });
+</script>
+
+<script> 
       document.addEventListener('DOMContentLoaded', function() {
           fetch('http://127.0.0.1:8000/en/api/category/')
               .then(response => {
@@ -631,6 +650,217 @@
         }
     });
 </script>
-  </body>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Helper function to get the current cart from session storage
+    function getCart() {
+        const cart = sessionStorage.getItem('Cart');
+        return cart ? JSON.parse(cart) : {};
+    }
+
+    // Helper function to save the cart to session storage
+    function saveCart(cart) {
+        sessionStorage.setItem('Cart', JSON.stringify(cart));
+    }
+
+    // Function to update the cart badge
+    function updateCartBadge() {
+        const cart = getCart();
+        const totalItems = Object.values(cart).reduce((total, item) => total + item.quantity, 0);
+        document.querySelector('#offcanvasCart .badge').textContent = totalItems;
+    }
+
+    // Attach event listener to the product grid for event delegation
+    const productGrid = document.getElementById('product_grid');
+    productGrid.addEventListener('click', function(event) {
+        if (event.target.matches('.nav-link[data-product-id]')) {
+            const button = event.target;
+            const productId = button.dataset.productId;
+            const productItem = button.closest('.product-item');
+            const quantityInput = productItem.querySelector('.quantity-input');
+            const quantity = parseInt(quantityInput.value);
+            const priceElement = productItem.querySelector('.price');
+            const priceText = priceElement.textContent.replace('$', '').trim();
+            const price = parseFloat(priceText);
+
+            // Validate quantity
+            if (quantity <= 0) {
+                alert('Quantity must be at least 1');
+                return;
+            }
+
+            // Get current cart
+            let cart = getCart();
+
+            // Add or update the product in the cart
+            if (productId in cart) {
+                cart[productId].quantity += quantity;
+            } else {
+                cart[productId] = { quantity: quantity, price: price };
+            }
+
+            // Save updated cart
+            saveCart(cart);
+
+            // Update cart badge
+            updateCartBadge();
+        }
+    });
+});
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let products = [];
+
+    // Fetch product data from the API
+    fetch('http://127.0.0.1:8000/en/api/products/')
+        .then(response => response.json())
+        .then(data => {
+            products = data;
+            updateCartDisplay(); // Update the cart display once products are fetched
+        })
+        .catch(error => console.error('Error fetching products:', error));
+
+    // Helper function to get the cart from session storage
+    function getCart() {
+        const cartData = sessionStorage.getItem('Cart');
+        return cartData ? JSON.parse(cartData) : {};
+    }
+
+    // Function to update the cart display with product names
+    function updateCartDisplay() {
+        const cart = getCart();
+        const cartItemsUl = document.getElementById('cart_items');
+        const cartCountsSpan = document.getElementById('cart_counts');
+
+        // Clear existing cart items
+        cartItemsUl.innerHTML = '';
+
+        let totalItems = 0;
+        let totalAmount = 0;
+
+        // Iterate through cart items using product ID as the key
+        for (const productId in cart) {
+            const item = cart[productId];
+            const quantity = item.quantity;
+            const price = item.price;
+
+            // Find the product name from the fetched products array
+            const product = products.find(p => p.id === parseInt(productId));
+            const productName = product ? product.name : `Product ${productId}`;
+
+            // Create a list item for the cart
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between lh-sm';
+            li.innerHTML = `
+                <div>
+                    <h6 class="my-0">${productName}</h6>
+                    <small class="text-body-secondary">Quantity: ${quantity}</small>
+                </div>
+                <span class="text-body-secondary">$${price.toFixed(2)}</span>
+            `;
+            cartItemsUl.appendChild(li);
+
+            totalItems += quantity;
+            totalAmount += quantity * price;
+        }
+
+        // Add total amount to the cart display
+        const totalLi = document.createElement('li');
+        totalLi.id = 'cart_total_amount';
+        totalLi.className = 'list-group-item d-flex justify-content-between';
+        totalLi.innerHTML = `
+            <span>Total (USD)</span>
+            <strong>$${totalAmount.toFixed(2)}</strong>
+        `;
+        total_home = document.getElementById('cart_total_show')
+        total_home.innerHTML = `$${totalAmount.toFixed(2)}`
+        cartItemsUl.appendChild(totalLi);
+
+        // Update the total item count in the UI
+        cartCountsSpan.textContent = totalItems;
+    }
+});
+  </script>
+
+
+
+  <script>
+    // Utility: read & parse the cart from sessionStorage
+    function getCartFromSession() {
+      console.log('[DEBUG] getCartFromSession: reading sessionStorage key "Cart"');
+      const raw = sessionStorage.getItem('Cart');
+      if (!raw) {
+        console.warn('[DEBUG] getCartFromSession: no "Cart" key found');
+        return {};
+      }
+      try {
+        const cartObj = JSON.parse(raw);
+        console.log('[DEBUG] getCartFromSession: parsed cart:', cartObj);
+        return cartObj;
+      } catch (err) {
+        console.error('[DEBUG] getCartFromSession: JSON.parse error:', err);
+        return {};
+      }
+    }
+  
+    document.getElementById('check_out_btn').addEventListener('click', function() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.log('[DEBUG] No accessToken—redirecting to login');
+        window.location.href = `{% url 'login_customer' %}`;
+        return;
+      }
+  
+      // 1. Grab the cart
+      const cart = getCartFromSession();
+      // 2. If cart is empty, bail out
+      if (Object.keys(cart).length === 0) {
+        alert('Your cart is empty!');
+        console.warn('[DEBUG] Checkout aborted: empty cart');
+        return;
+      }
+  
+      console.log('[DEBUG] Sending checkout request. Cart payload:', cart);
+  
+      // 3. Send the checkout POST
+      fetch('http://127.0.0.1:8000/en/api/checkout/', {
+        method: 'POST',
+        credentials: 'same-origin',     // will include the session cookie
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ cart })
+      })
+      .then(response => {
+        console.log('[DEBUG] Received response status:', response.status);
+        if (response.status === 401) {
+          console.log('[DEBUG] Unauthorized—redirecting to login');
+          window.location.href = `{% url 'login_customer' %}`;
+        } else if (response.ok) {
+          return response.json();
+        } else {
+          return response.json().then(errData => {
+            throw new Error(errData.message || 'Unknown checkout error');
+          });
+        }
+      })
+      .then(data => {
+        console.log('[DEBUG] Checkout successful. Server returned:', data);
+        alert('Checkout successful! Order ID: ' + data.id);
+        // optionally clear client-side cart
+        sessionStorage.removeItem('Cart');
+      })
+      .catch(error => {
+        console.error('[DEBUG] Checkout error:', error);
+        alert('Error during checkout: ' + error.message);
+      });
+    });
+  </script>
+  
+
+
+</body>
 </html>
 

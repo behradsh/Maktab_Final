@@ -197,7 +197,7 @@
 
           try {
             const response = await fetch(
-              "http://127.0.0.1:8000/en/register/customer/",
+              "http://127.0.0.1:8000/en/api/register/customer/",
               {
                 method: "POST",
                 headers: {
@@ -216,7 +216,7 @@
 
             // Registration successful
             alert("Registration successful! Please login.");
-            window.location.href = "/login";
+            window.location.href = `{% url 'login_customer' %}`;
           } catch (error) {
             const errorDiv = document.getElementById("errorMessages");
             errorDiv.classList.remove("d-none");

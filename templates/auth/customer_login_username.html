@@ -175,7 +175,7 @@
           // Parse JWT token to get user type
           const tokenData = parseJwt(data.access);
 
-          window.location.href = "{% url 'customer_dashboard_profile' %}"; // Customer dashboard
+          window.location.href = "{% url 'home_page' %}"; // Customer dashboard
           //window.location.href = `../dashboards/customer_dashboard.html?accessToken=${encodeURIComponent(data.access)}&refreshToken=${encodeURIComponent(data.refresh)}`;
 
           // Handle "Remember Me" functionality

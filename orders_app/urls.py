@@ -4,7 +4,8 @@ from .views import (CustomerAddressesAPIView, AddAddressAPIView,
                     CheckoutView)
 
 urlpatterns = [
-    path('cart/', CartView.as_view(), name='cart'),
+path('api/checkout/', CheckoutView.as_view(), name='checkout_cart'),
+    # path('cart/', CartView.as_view(), name='cart'),
     path('cart/items/<int:pk>/', CartItemUpdateView.as_view(), name='cart_item_update'),
     path('cart/items/<int:pk>/delete', CartItemDeleteView.as_view(), name='cart_item_delete'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),

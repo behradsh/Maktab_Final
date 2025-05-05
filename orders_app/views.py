@@ -1,10 +1,13 @@
 from django.shortcuts import render
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import viewsets, permissions,generics,views
 from .models import Orders,OrderItems,CartItem,Cart
 from .serializers import OrderSerializer,OrderItemSerializer,CartSerializer,CartItemSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_200_OK, HTTP_400_BAD_REQUEST
 from products_app.models import Product
+from decimal import Decimal
 from products_app.serializers import ProductSerializer
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from users_app.models import Address,CustomUser
@@ -16,6 +19,7 @@ import datetime
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
+from .service import Cart,CART_SESSION_ID
 import json
 # Create your views here.
 
@@ -50,146 +54,6 @@ def get_user_store(user):
         return employee.store_id
     except Exception:
         raise Exception('Not assigned to a store')
-
-
-# Cart and Checkout Views
-
-def get_cart(request):
-    cart = request.COOKIES.get('cart', None)
-    if cart:
-        cart = cart.replace('\'', '"')
-        cart = json.loads(cart)
-        return cart
-    return None
-
-
-# class AddToCartAPIView(views.APIView):
-#     permission_classes = [AllowAny]
-#     serializer_class = ProductSerializer
-#     model = Product
-#
-#     def post(self, request):
-#         pk = request.POST.get('pk')
-#         count = int(request.POST.get('count'))
-#         product = self.model.objects.get(id=pk)
-#         if count < product.quantity:
-#             cart = get_cart(request)
-#             pk = pk
-#             product_name = product.name
-#             price = product.price
-#             discount = "0"
-#             image = product.image
-#             if not cart:
-#                 temp_cart = {pk: {"product_name": product_name, "price": price, "count": count,
-#                                   "image": image}}
-#                 cart = f'{temp_cart}'
-#             else:
-#                 if pk in cart:
-#                     cart[pk]["count"] += count
-#                 else:
-#                     cart.update({pk: {"product_name": product_name, "price": price, "count": count,
-#                                       "image": image}})
-#             response = Response({'cart': 'ok'})
-#             expire = datetime.datetime.now() + datetime.timedelta(weeks=1)
-#             expire_string = expire.strftime("%a, %d-%b-%Y %H:%M:%S")
-#             response.set_cookie("cart", cart, expires=expire_string)
-#             response.data = {'cart_count': len(cart)}
-#             return response
-#         else:
-#             return Response({'product': 'not enough'}, status=HTTP_406_NOT_ACCEPTABLE)
-
-
-# class UpdateCartAPIView(views.APIView):
-#     permission_classes = [AllowAny]
-#     serializer_class = ProductSerializer
-#     model = Product
-#
-#     def get(self, request):
-#         cart = get_cart(request)
-#         if cart:
-#             return Response(cart)
-#         else:
-#             return Response({'cart': 'empty'})
-
-# class RemoveFromCartAPIView(views.APIView):
-#     permission_classes = [AllowAny]
-#
-#     def get(self, request):
-#         pk = request.GET.get('pk')
-#         cart = get_cart(request)
-#         cart.pop(pk)
-#         response = Response({'cart':'ok'})
-#         expire = datetime.datetime.now() + datetime.timedelta(weeks = 1)
-#         expire_string = expire.strftime("%a, %d-%b-%Y %H:%M:%S")
-#         response.set_cookie("cart", cart, expires=expire_string)
-#         response.data = {'cart_count': len(cart)}
-#         return response
-
-
-# class CartCountAPIView(views.APIView):
-#     permission_classes = [AllowAny]
-#
-#     def get(self, request):
-#         cart = get_cart(request)
-#         if cart:
-#             return Response({'cart_count': len(cart)}, status=HTTP_200_OK)
-#         else:
-#             return Response({'cart_count': 0}, status=HTTP_200_OK)
-
-# class TotalPriceAPIView(views.APIView):
-#     permission_classes = [IsAuthenticated]
-
-
-# class SubmitOrderAPIView(views.APIView):
-#     permission_classes = [IsAuthenticated]
-#     serializer_class = OrderSerializer
-#     model = Orders
-#     detail_model = OrderItems
-#     request = None
-#
-#     def clear_cookie(self, response):
-#         response.delete_cookie('cart')
-#
-#     def get_address(self):
-#         address_id = self.request.data['address_id']
-#         return Address.objects.get(id=address_id)
-#
-#     def get_user(self):
-#         return CustomUser.objects.get(id=self.request.user.id)
-#
-#     def post(self, request):
-#         request = request
-#         address = self.get_address()
-#         user = self.get_user()
-#         cart = get_cart(request)
-#         total_discount = 0
-#         details = []
-#         total_price = 0
-#
-#         for key, val in cart.items():
-#             temp = {}
-#             product = Product.objects.get(id=key)
-#             temp['product'] = product
-#             temp['quantity'] = val['count']
-#             temp['price'] = val['price']
-#             temp['discount'] = val['discount'] * val['count']
-#             total_price += (val['price'] * val['count'])
-#             total_discount += (val['discount'] * val['count'])
-#             details.append(temp)
-#             product.quantity -= val['count']
-#             product.save()
-#
-#         order = {'total_paid': total_price, 'total_discount': total_discount,
-#                   'customer': user, 'address': address}
-#
-#         order = self.model.objects.create(**order)
-#
-#         for detail in details:
-#             self.detail_model.objects.create(order=order, **detail)
-#
-#         response = Response(status=HTTP_200_OK)
-#         self.clear_cookie(response)
-#         return response
 
 
 class CustomerAddressesAPIView(views.APIView):
@@ -361,7 +225,7 @@ class CartItemDeleteView(generics.GenericAPIView):
             request.session.modified = True
             return Response({'detail': 'Product removed from cart'}, status=status.HTTP_204_NO_CONTENT)
 
-class CheckoutView(generics.GenericAPIView):
+class CheckoutView2(generics.GenericAPIView):
     permission_classes = [IsAuthenticated,IsCustomer]
     serializer_class = OrderSerializer
 
@@ -448,3 +312,91 @@ class SellerOrderUpdateView(generics.UpdateAPIView):
         if self.request.user.groups.filter(name='SellerOperators').exists():
             raise Exception('Operators cannot update orders')
         serializer.save()
+
+
+
+class CheckoutView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, IsCustomer]
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        # Debug: log raw request data and session
+        print("[DEBUG] request.data:", request.data)
+        print("[DEBUG] request.session keys:", list(request.session.keys()))
+        for item in list(request.session.keys()):
+            cd = request.data.get(item)
+            print("[DEBUG] cart_data:", cd)
+
+        # 1. Extract cart from POST payload
+        cart_data = request.data.get('cart')
+        print("[DEBUG] cart_data:", cart_data)
+        if not isinstance(cart_data, dict) or not cart_data:
+            print("[DEBUG] Empty or invalid cart_data")
+            return Response({"error": "Cart is empty or invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 2. Create Order
+        user = request.user
+        try:
+            address = Address.objects.get(customer=user)
+        except Address.DoesNotExist:
+            return Response({"error": "Shipping address not found"}, status=status.HTTP_400_BAD_REQUEST)
+        store = Store.objects.get(id=3)  # adjust as needed
+
+        order = Orders.objects.create(
+            customer=user,
+            address=address,
+            status='pending',
+            total_amount=Decimal('0.00'),
+            store=store,
+            discount=0
+        )
+        print("[DEBUG] Created order id:", order.id)
+
+        # 3. Process each cart item
+        total_amount = Decimal('0.00')
+        for prod_id_str, item in cart_data.items():
+            print(f"[DEBUG] Processing cart item: {prod_id_str} -> {item}")
+            try:
+                prod_id = int(prod_id_str)
+                quantity = int(item.get('quantity', 0))
+                price = Decimal(item.get('price', '0'))
+            except (ValueError, TypeError) as e:
+                print(f"[DEBUG] Invalid item data for product {prod_id_str}:", e)
+                return Response({"error": "Invalid item format"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if quantity <= 0:
+                print(f"[DEBUG] Skipping product {prod_id}: non-positive quantity {quantity}")
+                continue
+
+            # Fetch product
+            try:
+                product = Product.objects.get(id=prod_id)
+                print(f"[DEBUG] Fetched product {product.name}")
+            except Product.DoesNotExist:
+                print(f"[DEBUG] Product {prod_id} does not exist")
+                return Response({"error": f"Product {prod_id} does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create OrderItem; manager sets price if not provided
+            order_item = OrderItems.objects.create(
+                order=order,
+                product=product,
+                quantity=quantity,
+                price=price,
+                discount=item.get('discount', 0)
+            )
+            print(f"[DEBUG] Created order item id {order_item.id} price {order_item.price}")
+            total_amount += order_item.price
+            print(f"[DEBUG] Processing product {prod_id} and change its quantity")
+            print(f"before change-->{product.quantity}")
+            product.quantity -= quantity
+            product.save()
+            print(f"after change-->{product.quantity}")
+
+        # 4. Finalize order total
+        order.total_amount = total_amount
+        order.save()
+        print(f"[DEBUG] Order {order.id} saved with total_amount {order.total_amount}")
+
+        # 5. Respond
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

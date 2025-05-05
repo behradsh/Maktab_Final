@@ -55,8 +55,11 @@ def get_user_cart(user):
 
 class CustomerRegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.filter(is_customer=True)
-    permission_classes = (AllowAny,)
+    permission_classes = [AllowAny,]
     serializer_class = UserRegisterSerializer
+
+    def get_object(self):
+        return self.request.user
 
 
 class SellerRegisterView(generics.CreateAPIView):

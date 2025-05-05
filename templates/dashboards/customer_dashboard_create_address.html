@@ -191,7 +191,7 @@
                     }
         
                     alert('Address created successfully!');
-                    window.location.href = 'customer_dashboard_address.html'; // Redirect to the address dashboard
+                    window.location.href = `{% url 'customer_address_list' %}`; // Redirect to the address dashboard
                 } catch (error) {
                     console.error('Error creating new address:', error);
                 }
