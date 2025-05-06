@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-09 13:26+0330\n"
+"POT-Creation-Date: 2025-05-06 02:22+0330\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,588 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-#: config/settings.py:128
+
+#: config/settings.py:169
 msgid "Persian"
-msgstr ""
+msgstr "فارسی"
 
-#: config/settings.py:129
+#: config/settings.py:170
 msgid "English"
-msgstr ""
+msgstr "انگلیسی"
 
-#: core_app/views.py:6
-msgid "Hello World!"
-msgstr "سلام به وبسایت ما خوش آمدید"
+#: orders_app/models.py:11
+msgid "pending"
+msgstr "در انتظار"
+
+#: orders_app/models.py:11
+msgid "Pending"
+msgstr "در انتظار"
+
+#: orders_app/models.py:12
+msgid "processing"
+msgstr "در حال پردازش"
+
+#: orders_app/models.py:12
+msgid "Processing"
+msgstr "در حال پردازش"
+
+#: orders_app/models.py:13
+msgid "shipped"
+msgstr "ارسال شده"
+
+#: orders_app/models.py:13
+msgid "Shipped"
+msgstr "ارسال شده"
+
+#: orders_app/models.py:14
+msgid "delivered"
+msgstr "تحویل داده شده"
+
+#: orders_app/models.py:14
+msgid "Delivered"
+msgstr "تحویل داده شده"
+
+#: orders_app/models.py:15
+msgid "cancelled"
+msgstr "لغو شده"
+
+#: orders_app/models.py:15
+msgid "Cancelled"
+msgstr "لغو شده"
+
+#: orders_app/models.py:22 products_app/models.py:90
+msgid "Status"
+msgstr "وضعیت"
+
+#: orders_app/models.py:23 orders_app/models.py:64
+msgid "Discount"
+msgstr "تخفیف"
+
+#: orders_app/models.py:25 orders_app/models.py:66
+msgid "The discount applied to the order"
+msgstr "تخفیف اعمال‌شده روی سفارش"
+
+#: orders_app/models.py:26
+msgid "Total Amount"
+msgstr "مبلغ کل"
+
+#: orders_app/models.py:27 products_app/models.py:57 products_app/models.py:92
+#: store_app/models.py:11 store_app/models.py:46
+msgid "Created at"
+msgstr "تاریخ ایجاد"
+
+#: orders_app/models.py:28 products_app/models.py:58 products_app/models.py:93
+#: store_app/models.py:15
+msgid "Updated at"
+msgstr "تاریخ به‌روزرسانی"
+
+#: orders_app/models.py:32
+msgid "Orders"
+msgstr "سفارش‌ها"
+
+#: orders_app/models.py:62 products_app/models.py:55
+msgid "Quantity"
+msgstr "تعداد"
+
+#: orders_app/models.py:63 products_app/models.py:53
+msgid "Price"
+msgstr "قیمت"
+
+#: orders_app/models.py:85
+msgid "Order Items"
+msgstr "آیتم‌های سفارش"
+
+#: orders_app/models.py:94
+msgid "Cart"
+msgstr "سبد خرید"
+
+#: orders_app/models.py:124
+msgid "Cart Item"
+msgstr "آیتم سبد خرید"
+
+#: products_app/models.py:11
+msgid "Category Name"
+msgstr "نام دسته‌بندی"
+
+#: products_app/models.py:17
+msgid "subcategories"
+msgstr "زیردسته‌ها"
+
+#: products_app/models.py:18
+msgid "Parent Category"
+msgstr "دسته‌بندی والد"
+
+#: products_app/models.py:23
+msgid "Category"
+msgstr "دسته‌بندی"
+
+#: products_app/models.py:24
+msgid "Categories"
+msgstr "دسته‌بندی‌ها"
+
+#: products_app/models.py:48
+msgid "Product Name"
+msgstr "نام محصول"
+
+#: products_app/models.py:51
+msgid "Brand Name"
+msgstr "نام برند"
+
+#: products_app/models.py:52
+msgid "Description"
+msgstr "توضیحات"
+
+#: products_app/models.py:54
+msgid "Image"
+msgstr "تصویر"
+
+#: products_app/models.py:56 store_app/models.py:14
+msgid "Active"
+msgstr "فعال"
+
+#: products_app/models.py:60
+msgid "Products"
+msgstr "محصولات"
+
+#: products_app/models.py:83
+msgid "approved"
+msgstr "تایید شده"
+
+#: products_app/models.py:83
+msgid "Approved"
+msgstr "تایید شده"
+
+#: products_app/models.py:83
+msgid "waiting"
+msgstr "در انتظار"
+
+#: products_app/models.py:83
+msgid "Waiting"
+msgstr "در انتظار"
+
+#: products_app/models.py:83
+msgid "deny"
+msgstr "رد شده"
+
+#: products_app/models.py:83
+msgid "Deny"
+msgstr "رد شده"
+
+#: products_app/models.py:96
+msgid "Comments"
+msgstr "نظرات"
+
+#: store_app/models.py:8
+msgid "Name of Store"
+msgstr "نام فروشگاه"
+
+#: store_app/models.py:9
+msgid "Store City"
+msgstr "شهر فروشگاه"
+
+#: store_app/models.py:10
+msgid "Address of Store"
+msgstr "آدرس فروشگاه"
+
+#: store_app/models.py:12
+msgid "Owner"
+msgstr "مالک"
+
+#: store_app/models.py:13
+msgid "Logo of Store"
+msgstr "لوگوی فروشگاه"
+
+#: store_app/models.py:18
+msgid "Store"
+msgstr "فروشگاه"
+
+#: store_app/models.py:19
+msgid "Stores"
+msgstr "فروشگاه‌ها"
+
+#: store_app/models.py:44
+msgid "Manager"
+msgstr "مدیر"
+
+#: store_app/models.py:45
+msgid "Operator"
+msgstr "اپراتور"
+
+#: store_app/serializers.py:100
+msgid "User does not exist."
+msgstr "کاربر وجود ندارد."
+
+#: store_app/serializers.py:101
+msgid "User ID is required."
+msgstr "شناسه کاربر الزامی است."
+
+#: store_app/serializers.py:137 store_app/views.py:118
+msgid "Employee must have at least one role (manager or operator)."
+msgstr "کارمند باید حداقل یک نقش (مدیر یا اپراتور) داشته باشد."
+
+#: store_app/serializers.py:141
+msgid "User cannot be both manager and operator."
+msgstr "یک کاربر نمی‌تواند هم مدیر و هم اپراتور باشد."
+
+#: store_app/views.py:109
+msgid "Cannot change store association."
+msgstr "امکان تغییر وابستگی فروشگاه وجود ندارد."
+
+#: store_app/views.py:132
+msgid "Cannot delete the last manager of the store."
+msgstr "امکان حذف آخرین مدیر فروشگاه وجود ندارد."
+
+#: users_app/models.py:13
+msgid "tehran"
+msgstr "تهران"
+
+#: users_app/models.py:13
+msgid "Tehran"
+msgstr "تهران"
+
+#: users_app/models.py:14
+msgid "qom"
+msgstr "قم"
+
+#: users_app/models.py:14
+msgid "Qom"
+msgstr "قم"
+
+#: users_app/models.py:15
+msgid "markazi"
+msgstr "مرکزی"
+
+#: users_app/models.py:15
+msgid "Markazi"
+msgstr "مرکزی"
+
+#: users_app/models.py:16
+msgid "qazvin"
+msgstr "قزوین"
+
+#: users_app/models.py:16
+msgid "Qazvin"
+msgstr "قزوین"
+
+#: users_app/models.py:17
+msgid "gilan"
+msgstr "گیلان"
+
+#: users_app/models.py:17
+msgid "Gilan"
+msgstr "گیلان"
+
+#: users_app/models.py:18
+msgid "ardabil"
+msgstr "اردبیل"
+
+#: users_app/models.py:18
+msgid "Ardabil"
+msgstr "اردبیل"
+
+#: users_app/models.py:19
+msgid "zanjan"
+msgstr "زنجان"
+
+#: users_app/models.py:19
+msgid "Zanjan"
+msgstr "زنجان"
+
+#: users_app/models.py:20
+msgid "east_azarbaijan"
+msgstr "آذربایجان شرقی"
+
+#: users_app/models.py:20
+msgid "East Azarbaijan"
+msgstr "آذربایجان شرقی"
+
+#: users_app/models.py:21
+msgid "west_azarbaijan"
+msgstr "آذربایجان غربی"
+
+#: users_app/models.py:21
+msgid "West Azarbaijan"
+msgstr "آذربایجان غربی"
+
+#: users_app/models.py:22
+msgid "kurdistan"
+msgstr "کردستان"
+
+#: users_app/models.py:22
+msgid "Kurdistan"
+msgstr "کردستان"
+
+#: users_app/models.py:23
+msgid "hamadan"
+msgstr "همدان"
+
+#: users_app/models.py:23
+msgid "Hamadan"
+msgstr "همدان"
+
+#: users_app/models.py:24
+msgid "kermanshah"
+msgstr "کرمانشاه"
+
+#: users_app/models.py:24
+msgid "Kermanshah"
+msgstr "کرمانشاه"
+
+#: users_app/models.py:25
+msgid "ilam"
+msgstr "ایلام"
+
+#: users_app/models.py:25
+msgid "Ilam"
+msgstr "ایلام"
+
+#: users_app/models.py:26
+msgid "lorestan"
+msgstr "لرستان"
+
+#: users_app/models.py:26
+msgid "Lorestan"
+msgstr "لرستان"
+
+#: users_app/models.py:27
+msgid "khuzestan"
+msgstr "خوزستان"
+
+#: users_app/models.py:27
+msgid "Khuzestan"
+msgstr "خوزستان"
+
+#: users_app/models.py:28
+msgid "chahar_mahaal_and_bakhtiari"
+msgstr "چهارمحال و بختیاری"
+
+#: users_app/models.py:28
+msgid "Chahar Mahaal and Bakhtiari"
+msgstr "چهارمحال و بختیاری"
+
+#: users_app/models.py:29
+msgid "kohkiluyeh_and_buyer_ahmad"
+msgstr "کهگیلویه و بویراحمد"
+
+#: users_app/models.py:29
+msgid "Kohkiluyeh and Buyer Ahmad"
+msgstr "کهگیلویه و بویراحمد"
+
+#: users_app/models.py:30
+msgid "bushehr"
+msgstr "بوشهر"
+
+#: users_app/models.py:30
+msgid "Bushehr"
+msgstr "بوشهر"
+
+#: users_app/models.py:31
+msgid "fars"
+msgstr "فارس"
+
+#: users_app/models.py:31
+msgid "Fars"
+msgstr "فارس"
+
+#: users_app/models.py:32
+msgid "hormozgan"
+msgstr "هرمزگان"
+
+#: users_app/models.py:32
+msgid "Hormozgan"
+msgstr "هرمزگان"
+
+#: users_app/models.py:33
+msgid "sistan_and_baluchistan"
+msgstr "سیستان و بلوچستان"
+
+#: users_app/models.py:33
+msgid "Sistan and Baluchistan"
+msgstr "سیستان و بلوچستان"
+
+#: users_app/models.py:34
+msgid "kerman"
+msgstr "کرمان"
+
+#: users_app/models.py:34
+msgid "Kerman"
+msgstr "کرمان"
+
+#: users_app/models.py:35
+msgid "yazd"
+msgstr "یزد"
+
+#: users_app/models.py:35
+msgid "Yazd"
+msgstr "یزد"
+
+#: users_app/models.py:36
+msgid "esfahan"
+msgstr "اصفهان"
+
+#: users_app/models.py:36
+msgid "Esfahan"
+msgstr "اصفهان"
+
+#: users_app/models.py:37
+msgid "semnan"
+msgstr "سمنان"
+
+#: users_app/models.py:37
+msgid "Semnan"
+msgstr "سمنان"
+
+#: users_app/models.py:38
+msgid "mazandaran"
+msgstr "مازندران"
+
+#: users_app/models.py:38
+msgid "Mazandaran"
+msgstr "مازندران"
+
+#: users_app/models.py:39
+msgid "golestan"
+msgstr "گلستان"
+
+#: users_app/models.py:39
+msgid "Golestan"
+msgstr "گلستان"
+
+#: users_app/models.py:40
+msgid "north_khorasan"
+msgstr "خراسان شمالی"
+
+#: users_app/models.py:40
+msgid "North Khorasan"
+msgstr "خراسان شمالی"
+
+#: users_app/models.py:41
+msgid "razavi_khorasan"
+msgstr "خراسان رضوی"
+
+#: users_app/models.py:41
+msgid "Razavi Khorasan"
+msgstr "خراسان رضوی"
+
+#: users_app/models.py:42
+msgid "south_khorasan"
+msgstr "خراسان جنوبی"
+
+#: users_app/models.py:42
+msgid "South Khorasan"
+msgstr "خراسان جنوبی"
+
+#: users_app/models.py:43
+msgid "alborz"
+msgstr "البرز"
+
+#: users_app/models.py:43
+msgid "Alborz"
+msgstr "البرز"
+
+#: users_app/models.py:50
+msgid "staff status"
+msgstr "وضعیت کارمندی"
+
+#: users_app/models.py:52
+msgid "Designates whether the user can log into this admin site."
+msgstr "تعیین می‌کند که آیا کاربر می‌تواند به این پنل ادمین وارد شود."
+
+#: users_app/models.py:54
+msgid "customer status"
+msgstr "وضعیت مشتری"
+
+#: users_app/models.py:55
+msgid "Designates whether the user is buyer or seller."
+msgstr "تعیین می‌کند که کاربر خریدار است یا فروشنده."
+
+#: users_app/models.py:57
+msgid "gender status"
+msgstr "وضعیت جنسیت"
+
+#: users_app/models.py:59
+msgid "Designates whether the user is man(1) or woman(0)."
+msgstr "تعیین می‌کند که کاربر مرد (۱) است یا زن (۰)."
+
+#: users_app/models.py:61
+msgid "Phone number"
+msgstr "شماره تلفن"
+
+#: users_app/models.py:63
+msgid "email address"
+msgstr "آدرس ایمیل"
+
+#: users_app/models.py:64
+msgid "profile image"
+msgstr "تصویر پروفایل"
+
+#: users_app/models.py:67
+msgid "groups"
+msgstr "گروه‌ها"
+
+#: users_app/models.py:74
+msgid "user permissions"
+msgstr "مجوزهای کاربر"
+
+#: users_app/models.py:80
+msgid "OTP"
+msgstr "کد یکبارمصرف"
+
+#: users_app/models.py:86
+msgid "OTP Expiry"
+msgstr "انقضای کد یکبارمصرف"
+
+#: users_app/models.py:107
+msgid "Address line"
+msgstr "آدرس"
+
+#: users_app/models.py:108
+msgid "City"
+msgstr "شهر"
+
+#: users_app/models.py:109
+msgid "Province"
+msgstr "استان"
+
+#: users_app/models.py:110
+msgid "Country"
+msgstr "کشور"
+
+#: users_app/models.py:110
+msgid "Iran"
+msgstr "ایران"
+
+#: users_app/models.py:111
+msgid "Postal code"
+msgstr "کد پستی"
+
+#: users_app/models.py:112
+msgid "is default"
+msgstr "پیش‌فرض"
+
+#: users_app/serializers.py:147
+msgid "Invalid credentials, try again"
+msgstr "اعتبارسنجی ناموفق، دوباره تلاش کنید"
+
+#: users_app/serializers.py:149 users_app/serializers.py:271
+msgid "Account disabled, contact admin"
+msgstr "حساب غیرفعال است، با مدیر تماس بگیرید"
+
+#: users_app/serializers.py:205 users_app/serializers.py:305
+msgid "Invalid verification code"
+msgstr "کد تأیید نامعتبر"
+
+#: users_app/serializers.py:208 users_app/serializers.py:308
+msgid "Verification code has expired"
+msgstr "کد تأیید منقضی شده است"
+
+#: users_app/serializers.py:217
+msgid "No user found with this email"
+msgstr "هیچ کاربری با این ایمیل یافت نشد"
+
+#: users_app/serializers.py:275 users_app/serializers.py:315
+msgid "No user found with this phone number"
+msgstr "هیچ کاربری با این شماره تلفن یافت نشد"
+
+#~ msgid "Hello World!"
+#~ msgstr "سلام به وبسایت ما خوش آمدید"

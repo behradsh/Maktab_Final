@@ -74,12 +74,20 @@ class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
         user.save()
 
         # Assign groups
-        if validated_data.get('is_manager'):
-            group, _ = Group.objects.get_or_create(name='SellerManagers')
-            user.groups.add(group)
-        if validated_data.get('is_operator'):
-            group, _ = Group.objects.get_or_create(name='SellerOperators')
-            user.groups.add(group)
+        if is_manager:
+            try:
+                group = Group.objects.get(name='SellerManagers')
+                user.groups.add(group)
+                user.save()
+            except Exception as e:
+                group = None
+        if is_operator:
+            try:
+                group = Group.objects.get(name='SellerOperators')
+                user.groups.add(group)
+                user.save()
+            except Exception as e:
+                group = None
 
         # Create StoreEmployee
         emp = StoreEmployee.objects.create(
@@ -89,6 +97,7 @@ class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
             is_operator=is_operator,
             **validated_data
         )
+        emp.save()
         return emp
 
 

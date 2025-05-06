@@ -8,7 +8,7 @@ from .models import (Category,Product,Comment)
 from .serializers import (CategorySerializer,ProductSerializer,CommentSerializer)
 from core_app.custom_permissions import *
 from core_app.authentication import CsrfExemptSessionAuthentication
-from store_app.models import Store
+from store_app.models import Store,StoreEmployee
 from rest_framework import viewsets
 from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
@@ -34,11 +34,17 @@ class CustomerCommentsListTemplate(TemplateView):
 
 class SellerProductListCreateView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
+    permission_classes = [permissions.IsAuthenticated,IsSellerOrNot]
 
     def get_queryset(self):
-        store = Store.objects.get(owner=self.request.user)
-        return Product.objects.filter(store=store).order_by('-created_at')
+        if self.request.user.groups.filter(name='SellerOwners').exists():
+            store = Store.objects.get(owner=self.request.user)
+            return Product.objects.filter(store=store).order_by('-created_at')
+        elif self.request.user.groups.filter(name='SellerManagers').exists():
+            emp = StoreEmployee.objects.get(user_id=self.request.user)
+            print(emp.store_id)
+            store= Store.objects.get(id=emp.store_id.id)
+            return Product.objects.filter(store=store).order_by('-created_at')
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -49,11 +55,17 @@ class SellerProductListCreateView(generics.ListCreateAPIView):
 
 class SellerProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
+    permission_classes = [permissions.IsAuthenticated,IsSellerOrNot]
 
     def get_queryset(self):
-        store = Store.objects.get(owner=self.request.user)
-        return Product.objects.filter(store=store)
+        if self.request.user.groups.filter(name='SellerOwners').exists():
+            store = Store.objects.get(owner=self.request.user)
+            return Product.objects.filter(store=store)
+        elif self.request.user.groups.filter(name='SellerManagers').exists():
+            emp = StoreEmployee.objects.get(user_id=self.request.user)
+            print(emp.store_id)
+            store= Store.objects.get(id=emp.store_id.id)
+            return Product.objects.filter(store=store)
 
     def perform_update(self, serializer):
         user = self.request.user
