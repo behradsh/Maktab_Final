@@ -26,9 +26,9 @@ CustomerAddressEditTemplate,CustomerAddressCreateTemplate,
 CustomerRegisterTemplate,SellerRegisterTemplate,HomeTemplate,
 SellerDashboardTemplate,SellerDashboardChangePassTemplate,
 SellerOrderListView,SellerOrderUpdateView,SellerDashboardOrdersTemplate,
-SellerDashboardOrdersEditTemplate,
+SellerDashboardOrdersEditTemplate,CustomerOrderDetailsTemplate
                     )
-from orders_app.views import (CustomerOrderHistoryView)
+from orders_app.views import (CustomerOrderHistoryView,CustomerOrderDetailsView)
 from products_app.views import (CommentCreateView, UserCommentsListView)
 from store_app.views import (SellerStoreRetrieveView,
                              SellerStoreUpdateView, )
@@ -68,8 +68,10 @@ urlpatterns = [
     path('customer/dashboard/', CustomerDashboardTemplate.as_view(), name='customer_dashboard_profile'),
     path('api/customer/dashboard/profile/change_password/', ChangePasswordView.as_view(), name='change_password'),
     path('customer/dashboard/change_password/', CustomerChangePasswordTemplate.as_view(), name='customer_change_password'),
-    path('api/customer/dashboard/orders/', CustomerOrderHistoryView.as_view(), name='customer_orders'),
+    path('api/customer/dashboard/orders/', CustomerOrderHistoryView.as_view(), name='customer_orders_api'),
+    path('api/customer/dashboard/orders/<int:pk>/', CustomerOrderDetailsView.as_view(), name='customer_orders_details_api'),
     path('customer/dashboard/orders/', CustomerOrdersListTemplate.as_view(), name='customer_order_history'),
+    path('customer/dashboard/orders/<int:pk>/', CustomerOrderDetailsTemplate.as_view(), name='customer_order_details'),
     path('api/customer/dashboard/address/', CustomerAddressView.as_view(), name='customer_address'),
     path('customer/dashboard/address/create/', CustomerAddressCreateTemplate.as_view(), name='customer_address_create'),
     path('customer/dashboard/address/', CustomerAddressListTemplate.as_view(), name='customer_address_list'),

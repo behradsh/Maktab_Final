@@ -15,19 +15,11 @@ from django.contrib import messages
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    created_at_shamsi = serializers.SerializerMethodField()
-    updated_at_shamsi = serializers.SerializerMethodField()
     product = ProductSerializer()
 
     class Meta:
         model = OrderItems
-        fields = ['id', 'product', 'quantity', 'price', 'discount', 'created_at_shamsi', 'updated_at_shamsi']
-
-    def get_created_at_shamsi(self, obj):
-        return obj.created_at_shamsi
-
-    def get_updated_at_shamsi(self, obj):
-        return obj.updated_at_shamsi
+        fields = ['id', 'product', 'quantity', 'price', 'discount',]
 
 
 class OrderSerializer(serializers.ModelSerializer):

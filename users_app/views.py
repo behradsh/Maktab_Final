@@ -624,6 +624,8 @@ class CustomerAddressEditTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_edit_address.html"
 class CustomerAddressCreateTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_create_address.html"
+class CustomerOrderDetailsTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard_orders_details.html"
 
 class CustomerRegisterTemplate(TemplateView):
     template_name = "auth/Customer_register.html"

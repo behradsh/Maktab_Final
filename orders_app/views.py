@@ -30,16 +30,14 @@ class CustomerOrderHistoryView(generics.ListAPIView):
     def get_queryset(self):
         return Orders.objects.filter(customer=self.request.user)
 
-#get or create session cart
-def get_session_cart(request):
-    if 'cart' not in request.session:
-        request.session['cart'] = {}  # {product_id: quantity}
-    return request.session['cart']
+class CustomerOrderDetailsView(generics.ListAPIView):
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
 
-#get user cart
-def get_user_cart(user):
-    cart, created = Cart.objects.get_or_create(user=user)
-    return cart
+    def get_queryset(self):
+        # Get the order ID from the URL
+        order_id = self.kwargs.get('pk')  # Use 'pk' to match the URL parameter
+        return OrderItems.objects.filter(order_id=order_id)
 
 def get_user_store(user):
     if user.groups.filter(name='SellerOwners').exists():
