@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
+from rest_framework.exceptions import ValidationError
 from django.http import JsonResponse
 from django.db.models import Q
+from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import generics,permissions
 from .models import (Category,Product,Comment)
@@ -132,6 +134,22 @@ class CategoryDetailView(generics.RetrieveAPIView):
         context['request'] = self.request
         return context
 
+class CustomerSubmitCommentsView(generics.ListCreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        product_id = self.kwargs.get('pk')
+        return Comment.objects.filter(product_id=product_id)
+
+    def perform_create(self, serializer):
+        product_id = self.kwargs.get('pk')
+        product = get_object_or_404(Product, id=product_id)
+        try:
+            serializer.save(user=self.request.user, product=product)
+        except ValidationError as e:
+            print(f"Validation Error: {e}")
+            raise
 
 
 def search_products(request):
@@ -176,3 +194,6 @@ class SellerCategoryUpdateTemplate(TemplateView):
     template_name = "dashboards/seller_dashboard_category_edit.html"
 class SellerCategoryCreateTemplate(TemplateView):
     template_name = "dashboards/seller_dashboard_category_add.html"
+
+class CustomerDashboardSubmitCommentsTemplate(TemplateView):
+    template_name = "dashboards/customer_dashboard_comments_submit.html"

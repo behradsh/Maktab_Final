@@ -7,7 +7,7 @@ from .views import (SellerProductListCreateView,SellerProductRetrieveUpdateDestr
                     SellerDashboardCreateProductTemplate,SellerDashboardEditProductTemplate,
                     SellerCategoryCreateTemplate,SellerCategoryUpdateTemplate,
                     SellerCategoryListTemplate,ProductPageTemplate,ProductDetailsView,CategoryDetailView,
-                    search_products)
+                    search_products,CustomerSubmitCommentsView,CustomerDashboardSubmitCommentsTemplate)
 
 urlpatterns = [
     path('api/search/', search_products, name='search_products'),
@@ -29,5 +29,7 @@ urlpatterns = [
          name='category_update_delete_api'),
     path('api/customer/dashboard/comments/', UserCommentsListView.as_view(), name='customer_comments_api'),
     path('customer/dashboard/comments/', CustomerCommentsListTemplate.as_view(), name='customer_comments'),
+    path('api/customer/dashboard/comments/product/<int:pk>/', CustomerSubmitCommentsView.as_view(), name='customer_comments_submit_api'),
+    path('customer/dashboard/comments/product/<int:pk>/', CustomerDashboardSubmitCommentsTemplate.as_view(), name='customer_comments_submit'),
     path('api/customer/dashboard/comments/create/', CommentCreateView.as_view(), name='customer_comments_create_api'),
 ]

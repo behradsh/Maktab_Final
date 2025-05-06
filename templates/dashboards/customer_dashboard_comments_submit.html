@@ -16,9 +16,9 @@
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">Customer Panel</a>
+            <a class="navbar-brand ps-3">Customer Panel</a>
             <!-- Sidebar Toggle-->
-            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
             <!-- Navbar Search-->
             <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
                 <div class="input-group">
@@ -29,7 +29,7 @@
             <!-- Navbar-->
             <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#!">Settings</a></li>
                         <li><a class="dropdown-item" href="#!">Activity Log</a></li>
@@ -87,10 +87,30 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Orders Details</h1>
-                        <section id='order_details_section'>
-
-                        </section>
+                        <h1 class="mt-4">Submit Comment</h1>
+                        <!-- filepath: /home/blank/PycharmProjects/MSh-Projects/GitProjects/Maktab_Final/src/config/templates/dashboards/customer_dashboard_comments_submit.html -->
+<section id="submit_comments_section">
+    <div id="product_info" class="mb-4">
+        <!-- Product info will be dynamically added here -->
+    </div>
+    <form id="commentForm" class="mb-4">
+        <div class="mb-3">
+            <label for="rating" class="form-label">Rating</label>
+            <select id="rating" name="rating" class="form-select" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Comment</label>
+            <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+    </form>
+</section>
                         
                         <div class="row">
                             
@@ -110,64 +130,12 @@
         <script src="{% static 'dashboards/css/js/scripts.js' %}"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
         <script>
-// Function to parse query parameters
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-
-// Retrieve tokens from query parameters
-const accessToken = getQueryParam('accessToken');
-const refreshToken = getQueryParam('refreshToken');
-
-// Optionally, store them in localStorage for further use
-if (accessToken && refreshToken) {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-}
-        </script>
-        <script>
             // Function to fetch user profile and populate the form
-            async function fetchUserProfile() {
-                const accessToken = localStorage.getItem('accessToken');
-                if (!accessToken) {
-                    console.error('Access token is missing.');
-                    return;
-                }
-        
-                try {
-                    const response = await fetch('http://127.0.0.1:8000/en/api/customer/dashboard/profile/', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-        
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch user profile.');
-                    }
-        
-                    const data = await response.json();
-                    populateProfileForm(data); // Assuming the response is an array with one object
-                } catch (error) {
-                    console.error('Error fetching user profile:', error);
-                }
-            }
-        
             // Function to populate the form with user data
             function populateProfileForm(user) {
                 const name_of_profile = document.getElementById('login_user')
                 name_of_profile.innerHTML=`Logged in as:${user.username}`
             }
-        
-            // Fetch user profile on page load
-            document.addEventListener('DOMContentLoaded', fetchUserProfile);
-        </script>
-
-        
-        <script>
-            // Function to fetch user profile and populate the form
             async function fetchUserProfile() {
                 const accessToken = localStorage.getItem('accessToken');
                 if (!accessToken) {
@@ -194,130 +162,110 @@ if (accessToken && refreshToken) {
                     console.error('Error fetching user profile:', error);
                 }
             }
-            
-            // Fetch user profile on page load
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
+
+            
         </script>
-        <script>
-            function populateProfileForm(user) {
-                const name_of_profile = document.getElementById('login_user')
-                name_of_profile.innerHTML=`Logged in as:${user.username}`
-            }
-        </script>
+
         <script>
             document.addEventListener('DOMContentLoaded', async function () {
-                const orderId = window.location.pathname.split('/').filter(Boolean).pop(); // Extract order ID from URL
+                const productId = window.location.pathname.split('/').filter(Boolean).pop(); // Extract product ID from URL
             
+                // Fetch product info
                 try {
-                    const response = await fetch(`http://127.0.0.1:8000/en/api/customer/dashboard/orders/${orderId}/`, {
+                    const productResponse = await fetch(`http://127.0.0.1:8000/en/api/products/${productId}/`, {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-                            'Content-Type': 'application/json'
-                        }
+                            'Content-Type': 'application/json',
+                        },
                     });
             
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch order details.');
+                    if (!productResponse.ok) {
+                        throw new Error('Failed to fetch product info.');
                     }
             
-                    const orderItems = await response.json();
-                    const orderDetailsSection = document.getElementById('order_details_section');
-                    orderDetailsSection.innerHTML = ''; // Clear previous content
-            
-                    orderItems.forEach(item => {
-                        const orderItemCard = `
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h5 class="card-title">${item.product.name}</h5>
-                                    <p class="card-text">Quantity: ${item.quantity}</p>
-                                    <p class="card-text">Price: $${item.price}</p>
-                                    <p class="card-text">Discount: ${item.discount}%</p>
-                                    <button class="btn-outline-primary">
-<a href="http://127.0.0.1:8000/en/customer/dashboard/comments/product/${item.product.id}/">
-                                            Submit Rating to Product
-                                        </a>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                        orderDetailsSection.innerHTML += orderItemCard;
-                    });
+                    const product = await productResponse.json();
+                    const productInfoDiv = document.getElementById('product_info');
+                    productInfoDiv.innerHTML = `
+                        <h2>
+                            <a href="http://127.0.0.1:8000/en/product/${product.id}/" class="text-decoration-none">
+                                ${product.name} (ID: ${product.id})
+                            </a>
+                        </h2>
+                    `;
                 } catch (error) {
-                    console.error('Error fetching order details:', error);
-                    alert('Failed to load order details. Please try again later.');
+                    console.error('Error fetching product info:', error);
+                    alert('Failed to load product info. Please try again later.');
                 }
-            });
-        </script>
-        <script>
-          document.getElementById('logout_btn').addEventListener('click', async function(e) {
-            e.preventDefault();
-        
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                // Already logged out or no token
-                window.location.href = '/en/login/';
-                return;
-            }
-        
-            try {
-                const response = await fetch('http://127.0.0.1:8000/en/api/logout/', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
+            
+                // Handle comment form submission
+                const commentForm = document.getElementById('commentForm');
+                commentForm.addEventListener('submit', async function (e) {
+                    e.preventDefault(); // Prevent default form submission
+            
+                    const formData = new FormData(commentForm);
+                    const data = Object.fromEntries(formData.entries()); // Convert form data to JSON
+                    data.product = productId; // Add the product ID to the request payload
+            
+                    try {
+                        const response = await fetch(`http://127.0.0.1:8000/en/api/customer/dashboard/comments/product/${productId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data),
+                        });
+            
+                        if (!response.ok) {
+                            throw new Error('Failed to submit comment.');
+                        }
+            
+                        alert('Comment submitted successfully!');
+                        commentForm.reset(); // Reset the form after successful submission
+                    } catch (error) {
+                        console.error('Error submitting comment:', error);
+                        alert('Failed to submit comment. Please try again later.');
                     }
                 });
-        
-                // Remove tokens from localStorage
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-        
-                // Redirect to login page (or homepage)
-                window.location.href = `{% url 'home_page'%}`;
-            } catch (error) {
-                // Even if error, clear tokens and redirect
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                window.location.href = `{% url 'home_page'%}`;
-            }
-        });
-    </script>
-    <script>
-        document.getElementById('logout_btn').addEventListener('click', async function(e) {
-          e.preventDefault();
-      
-          const accessToken = localStorage.getItem('accessToken');
-          if (!accessToken) {
-              // Already logged out or no token
-              window.location.href = '/en/login/';
-              return;
-          }
-      
-          try {
-              const response = await fetch('http://127.0.0.1:8000/en/api/logout/', {
-                  method: 'POST',
-                  headers: {
-                      'Authorization': `Bearer ${accessToken}`,
-                      'Content-Type': 'application/json'
-                  }
-              });
-      
-              // Remove tokens from localStorage
-              localStorage.removeItem('accessToken');
-              localStorage.removeItem('refreshToken');
-      
-              // Redirect to login page (or homepage)
-              window.location.href = `{% url 'home_page'%}`;
-          } catch (error) {
-              // Even if error, clear tokens and redirect
-              localStorage.removeItem('accessToken');
-              localStorage.removeItem('refreshToken');
-              window.location.href = `{% url 'home_page'%}`;
-          }
-      });
-  </script>
+            });
+        </script>
 
+        <script>
+            document.getElementById('logout_btn').addEventListener('click', async function(e) {
+              e.preventDefault();
+          
+              const accessToken = localStorage.getItem('accessToken');
+              if (!accessToken) {
+                  // Already logged out or no token
+                  window.location.href = '/en/login/';
+                  return;
+              }
+          
+              try {
+                  const response = await fetch('http://127.0.0.1:8000/en/api/logout/', {
+                      method: 'POST',
+                      headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                      }
+                  });
+          
+                  // Remove tokens from localStorage
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+          
+                  // Redirect to login page (or homepage)
+                  window.location.href = `{% url 'home_page'%}`;
+              } catch (error) {
+                  // Even if error, clear tokens and redirect
+                  localStorage.removeItem('accessToken');
+                  localStorage.removeItem('refreshToken');
+                  window.location.href = `{% url 'home_page'%}`;
+              }
+          });
+      </script>
+  
         <script>
             document.getElementById('customer_orders').addEventListener('click', function(e) {
               // Prevent the default link behavior
@@ -374,6 +322,6 @@ if (accessToken && refreshToken) {
                 window.location.href = `http://127.0.0.1:8000/en/customer/dashboard/change_password/`;
             });
           </script>
-  
+
     </body>
 </html>
