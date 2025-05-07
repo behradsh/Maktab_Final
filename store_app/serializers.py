@@ -5,6 +5,9 @@ from django.contrib.auth.models import Group,Permission
 from django.utils.translation import gettext_lazy as _
 
 class StoreSerializer(serializers.ModelSerializer):
+    """
+    serializer for store model
+    """
     created_at_shamsi = serializers.SerializerMethodField()
     updated_at_shamsi = serializers.SerializerMethodField()
     class Meta:
@@ -19,6 +22,9 @@ class StoreSerializer(serializers.ModelSerializer):
         return obj.updated_at_shamsi
 
 class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
+    """
+    serializer for creating store employee model
+    """
     created_at_shamsi = serializers.SerializerMethodField()
     username = serializers.CharField(write_only=True, required=True,)  # Include username from CustomUser
     firstname = serializers.CharField(write_only=True, required=True,)
@@ -102,6 +108,9 @@ class StoreEmployeeCreateSerializer(serializers.ModelSerializer):
 
 
 class StoreEmployeeSerializer(serializers.ModelSerializer):
+    """
+        serializer for store employee model
+    """
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=CustomUser.objects.all(),
         required=True,
@@ -112,7 +121,7 @@ class StoreEmployeeSerializer(serializers.ModelSerializer):
     )
     store_id = serializers.PrimaryKeyRelatedField(
         queryset=Store.objects.all(),
-        required=False  # Will be set in the view
+        required=False  # Will set in the view
     )
     username = serializers.CharField(source='user_id.username', read_only=True)
     email = serializers.EmailField(source='user_id.email', read_only=True)

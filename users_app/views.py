@@ -1,15 +1,10 @@
 from itertools import count
 from django.views.generic import TemplateView
-from django.shortcuts import render
 from django.utils import timezone
 from datetime import timedelta
 import random
 from rest_framework import (generics, status, views, permissions, viewsets)
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser, Address
 from products_app.models import Product
 from products_app.serializers import ProductSerializer
@@ -30,7 +25,6 @@ from .serializers import (UserRegisterSerializer,
                           SellerChangePasswordSerializer, )
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from django.utils.translation import gettext_lazy as _
 from .tasks import (send_otp_email, send_sms_otp)
 from core_app.custom_permissions import *
@@ -54,8 +48,11 @@ def get_user_cart(user):
 
 
 class CustomerRegisterView(generics.CreateAPIView):
+    """
+    views for registering Customers
+    """
     queryset = CustomUser.objects.filter(is_customer=True)
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
     serializer_class = UserRegisterSerializer
 
     def get_object(self):
@@ -63,6 +60,9 @@ class CustomerRegisterView(generics.CreateAPIView):
 
 
 class SellerRegisterView(generics.CreateAPIView):
+    """
+        views for registering seller
+    """
     serializer_class = SellerRegisterSerializer
     queryset = CustomUser.objects.filter(is_customer=False)
     permission_classes = (AllowAny,)
@@ -71,6 +71,9 @@ class SellerRegisterView(generics.CreateAPIView):
         return self.request.user
 
     def update(self, request, *args, **kwargs):
+        """
+        method for updating user psasword
+        """
         user = self.get_object()
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -87,6 +90,9 @@ class SellerRegisterView(generics.CreateAPIView):
 
 
 class LogOutAPIView(APIView):
+    """
+    logout View
+    """
     serializer_class = LogOutSerializer
     permission_classes = [IsAuthenticated]
 
@@ -98,14 +104,17 @@ class LogOutAPIView(APIView):
         return Response("Successfully LoggedOut", status=status.HTTP_204_NO_CONTENT)
 
 
-# Implementing the OTP for sending mail
 def generate_random_digits(n=6):
+    """
+    generate the OTP for sending mail
+    """
     return "".join(map(str, random.sample(range(0, 10), n)))
 
 
+# TODO - need to create front pages
 class LoginOTPView(APIView):
     """
-    Handle initial login authentication and OTP generation
+    Handle login authentication and OTP
     """
     permission_classes = [AllowAny]
     serializer_class = LoginOTPRequestSerializer
@@ -118,7 +127,7 @@ class LoginOTPView(APIView):
         email = serializer.validated_data['email']
 
         try:
-            # Generate a 6-digit code and set the expiry time to 1 hour from now
+            # a 6-digit code and set the expiry time to 1 hour from now
             verification_code = generate_random_digits()
             user.otp = verification_code
             user.otp_expiry_time = timezone.now() + timedelta(hours=1)
@@ -139,9 +148,10 @@ class LoginOTPView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# TODO - need to create front pages
 class VerifyOTPView(APIView):
     """
-    Verify OTP and issue JWT tokens
+    Verify OTP and return JWT Token
     """
     permission_classes = [AllowAny]
     serializer_class = VerifyOTPSerializer
@@ -175,7 +185,11 @@ class VerifyOTPView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# TODO - need to create front pages
 class ResendOTPView(APIView):
+    """
+    View for resending OTP
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -197,7 +211,11 @@ class ResendOTPView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
+# TODO - need to create front pages
 class PhoneLoginView(APIView):
+    """
+    View for logging in with phone number and send otp to user number
+    """
     permission_classes = [AllowAny]
     serializer_class = PhoneLoginRequestSerializer
 
@@ -209,11 +227,12 @@ class PhoneLoginView(APIView):
         phone = serializer.validated_data['phone']
 
         try:
+            # creating otp code and set on user model
             verification_code = generate_random_digits()
             user.otp = verification_code
             user.otp_expiry_time = timezone.now() + timedelta(minutes=10)
             user.save()
-
+            # sending otp code to user phone
             send_sms_otp.delay(phone, verification_code)
 
             return Response({
@@ -228,7 +247,11 @@ class PhoneLoginView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# TODO - need to create front pages
 class PhoneVerifyOTPView(APIView):
+    """
+    view for verifying the OTP send to user phone number and return JWT Token
+    """
     permission_classes = [AllowAny]
     serializer_class = PhoneVerifyOTPSerializer
 
@@ -240,6 +263,7 @@ class PhoneVerifyOTPView(APIView):
 
         try:
             user = CustomUser.objects.get(phone=phone)
+            # reset otp after veritying user
             user.otp = None
             user.otp_expiry_time = None
             user.save()
@@ -276,6 +300,9 @@ class PhoneVerifyOTPView(APIView):
 
 
 class CustomerProfileView(generics.RetrieveUpdateAPIView):
+    """
+    view for customers profile data
+    """
     serializer_class = CustomerProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -284,6 +311,9 @@ class CustomerProfileView(generics.RetrieveUpdateAPIView):
 
 
 class ChangePasswordView(generics.UpdateAPIView):
+    """
+    view for changing password for customers
+    """
     serializer_class = ChangePasswordSerializer
     model = CustomUser
     permission_classes = (IsAuthenticated,)
@@ -301,6 +331,9 @@ class ChangePasswordView(generics.UpdateAPIView):
 
 
 class CustomerAddressView(generics.ListCreateAPIView):
+    """
+    view for customer list and create address
+    """
     serializer_class = AddressSerializer
     model = Address
     permission_classes = (IsAuthenticated,)
@@ -315,13 +348,16 @@ class CustomerAddressView(generics.ListCreateAPIView):
 
 
 class CustomerAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    view for retrieve and update customer address
+    """
     serializer_class = AddressSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Address.objects.filter(customer=self.request.user)
 
-    # Optional: Add this method to ensure users can only modify their own addresses
+    # checking users can change their addresses
     def check_object_permissions(self, request, obj):
         if obj.customer != request.user:
             self.permission_denied(request, message="You don't have permission to access this address.")
@@ -337,12 +373,15 @@ class CustomerAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
     def perform_destroy(self, instance):
+        # deleting customer address
         instance.delete()
         return "Address deleted."
 
 
-
 class SellerProfileView(generics.RetrieveUpdateAPIView):
+    """
+    view for seller profile detail
+    """
     serializer_class = SellerProfileSerializer
     permission_classes = [permissions.IsAuthenticated, IsSellerOrNot]
 
@@ -362,6 +401,9 @@ class SellerProfileView(generics.RetrieveUpdateAPIView):
 
 
 class SellerChangePasswordView(generics.UpdateAPIView):
+    """
+        view for changing password for sellers
+     """
     serializer_class = SellerChangePasswordSerializer
     model = CustomUser
     permission_classes = (IsAuthenticated, IsSellerOrNot)
@@ -379,16 +421,15 @@ class SellerChangePasswordView(generics.UpdateAPIView):
 
 
 class HomeView(generics.ListAPIView):
+    """
+    this view is for home page
+    """
     permission_classes = []
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
-
-class HomeTemplate(TemplateView):
-    template_name = 'main/home_test.html'
-
 
 
 def get_user_store(user):
@@ -398,15 +439,18 @@ def get_user_store(user):
         except Store.DoesNotExist:
             raise Exception('Store not found')
     try:
-        # Access through the user_store related_name from StoreEmployee model
+        # Access the user_store from StoreEmployee model
         employee = user.user_store
-        # Return the store using store_id field (ForeignKey to Store)
+        # Return the store using store_id
         return employee.store_id
     except StoreEmployee.DoesNotExist:
         raise Exception('Not assigned to a store')
 
 
 class SellerProductListCreateView(generics.ListCreateAPIView):
+    """
+    view for list and create product of seller's store
+    """
     permission_classes = [permissions.IsAuthenticated, IsSellerOrNot, IsSellerOwner, IsSellerManager]
     serializer_class = ProductSerializer
 
@@ -422,6 +466,9 @@ class SellerProductListCreateView(generics.ListCreateAPIView):
 
 
 class SellerProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+        view for update and delete product of seller's store
+        """
     permission_classes = [permissions.IsAuthenticated, IsSellerOrNot, IsSellerOwner, IsSellerManager]
     serializer_class = ProductSerializer
 
@@ -441,7 +488,10 @@ class SellerProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
 
 
 class SellerOrderListView(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager,]
+    """
+        view for listing orders of seller's store'
+    """
+    permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager, ]
     serializer_class = OrderSerializer
 
     def get_queryset(self):
@@ -452,6 +502,8 @@ class SellerOrderListView(generics.ListCreateAPIView):
             'orderitems_set__product'
         ).order_by('-created_at')
 
+    # Duplicate code
+    # TODO - refactor this part
     def get_user_store(self, user):
         if hasattr(user, 'user_store'):
             return user.user_store.store_id
@@ -466,6 +518,9 @@ class SellerOrderListView(generics.ListCreateAPIView):
 
 
 class SellerOrderUpdateView(generics.RetrieveUpdateAPIView):
+    """
+            view for listing and updating orders of seller's store'
+    """
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
     serializer_class = OrderSerializer
 
@@ -477,6 +532,7 @@ class SellerOrderUpdateView(generics.RetrieveUpdateAPIView):
             'orderitems_set__product'
         ).order_by('-created_at')
 
+    # TODO - refactor this part
     def get_user_store(self, user):
         if hasattr(user, 'user_store'):
             return user.user_store.store_id
@@ -491,6 +547,9 @@ class SellerOrderUpdateView(generics.RetrieveUpdateAPIView):
 
 
 class SellerEmployeeListCreateView(generics.ListCreateAPIView):
+    """
+    view for sellers to create employees for store
+    """
     permission_classes = [permissions.IsAuthenticated, IsSellerOrNot, IsSellerOwner, ]
     serializer_class = StoreEmployeeCreateSerializer
 
@@ -504,6 +563,9 @@ class SellerEmployeeListCreateView(generics.ListCreateAPIView):
 
 
 class SellerEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+        view for sellers to update and delete employees of store
+    """
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
     serializer_class = StoreEmployeeCreateSerializer
 
@@ -511,6 +573,7 @@ class SellerEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIV
         store = self.get_user_store(self.request.user)
         return StoreEmployee.objects.filter(store_id=store).select_related('user_id')
 
+    # TODO - refactor this part
     def get_user_store(self, user):
         if hasattr(user, 'store'):
             return user.store
@@ -539,6 +602,9 @@ class SellerEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIV
 
 
 class SellerReportsView(generics.GenericAPIView):
+    """
+    view for report store details to seller
+    """
     permission_classes = [permissions.IsAuthenticated, IsSellerOrNot, IsSellerOwner]
 
     def get(self, request, *args, **kwargs):
@@ -605,14 +671,22 @@ class SellerReportsView(generics.GenericAPIView):
         raise Exception("User is not a store owner")
 
 
+############### TEMPLATES ####################
+class HomeTemplate(TemplateView):
+    template_name = 'main/home_test.html'
+
+
 class LoginTemplateView(TemplateView):
     template_name = "auth/customer_login_username.html"
+
 
 class CustomerDashboardTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard.html"
 
+
 class CustomerChangePasswordTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_change_pass.html"
+
 
 class CustomerOrdersListTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_orders.html"
@@ -620,30 +694,43 @@ class CustomerOrdersListTemplate(TemplateView):
 
 class CustomerAddressListTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_address.html"
+
+
 class CustomerAddressEditTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_edit_address.html"
+
+
 class CustomerAddressCreateTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_create_address.html"
+
+
 class CustomerOrderDetailsTemplate(TemplateView):
     template_name = "dashboards/customer_dashboard_orders_details.html"
+
 
 class CustomerRegisterTemplate(TemplateView):
     template_name = "auth/Customer_register.html"
 
+
 class SellerRegisterTemplate(TemplateView):
     template_name = "auth/Seller_register.html"
+
 
 class SellerLoginTemplate(TemplateView):
     template_name = "auth/seller_login_username.html"
 
+
 class SellerDashboardTemplate(TemplateView):
     template_name = "dashboards/seller_dashboard.html"
+
 
 class SellerDashboardChangePassTemplate(TemplateView):
     template_name = "dashboards/seller_dashboard_change_pass.html"
 
+
 class SellerDashboardOrdersTemplate(TemplateView):
     template_name = "dashboards/seller_dashboard_orders.html"
+
 
 class SellerDashboardOrdersEditTemplate(TemplateView):
     template_name = "dashboards/seller_dashboard_orders_edit.html"

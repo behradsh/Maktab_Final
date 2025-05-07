@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from orders_app.models import OrderItems
 
 
 class IsStaff(permissions.BasePermission):
@@ -72,3 +73,36 @@ class IsSellerOwnerOrEmployee(permissions.BasePermission):
         is_owner = request.user.groups.filter(name='SellerOwners').exists()
         is_employee = hasattr(request.user, 'user_store')
         return is_owner or is_employee
+
+class HasPurchasedProduct(permissions.BasePermission):
+    """
+    Allow GET (listing existing comments) for everyone authenticated,
+    but only allow POST if the user has at least one OrderItem
+    referencing the product they’re commenting on.
+    """
+
+    def has_permission(self, request, view):
+        # Allow any authenticated user to list comments
+        if request.method in ('GET', 'HEAD', 'OPTIONS'):
+            return request.user and request.user.is_authenticated
+
+        # For POST (creating), we need to check product ownership
+        if request.method == 'POST':
+            user = request.user
+            if not user or not user.is_authenticated:
+                return False
+
+            # Expect the URL kwarg 'pk' for product ID, or
+            # fall back to request.data['product']
+            product_id = view.kwargs.get('pk') or request.data.get('product')
+            if not product_id:
+                return False
+
+            # Check if the user has any order item for that product
+            return OrderItems.objects.filter(
+                order__customer=user,
+                product_id=product_id
+            ).exists()
+
+        # Default deny
+        return False

@@ -6,6 +6,7 @@ from django.db.models import Q
 CustomUser = get_user_model()
 
 class EmailBackend(ModelBackend):
+    # rewrite BackEnd for authenticating user base on Email
     def authenticate(self, request, email=None, password=None, **kwargs):
         try:
             user = CustomUser.objects.get(email__iexact=email)
@@ -15,6 +16,7 @@ class EmailBackend(ModelBackend):
             return None
 
 class PhoneBackend(ModelBackend):
+    # rewrite BackEnd for authenticating user base on phone number and otp
     def authenticate(self, request, phone=None, password=None, **kwargs):
         try:
             user = CustomUser.objects.get(phone__iexact=phone)

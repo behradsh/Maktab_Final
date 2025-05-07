@@ -15,7 +15,7 @@ from rest_framework_simplejwt.tokens import (RefreshToken, AccessToken, TokenErr
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
-# Serializers for Customer Registration
+# Serializers Customer Registration
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True,
                                      validators=[validate_password])
@@ -59,7 +59,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-# Serializers for Seller Registration
+# Serializers Seller Registration
 class SellerRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True,
                                      validators=[validate_password])
@@ -109,7 +109,6 @@ class SellerRegisterSerializer(serializers.ModelSerializer):
             city=validated_data.get('store_city'),
         )
         user.save()
-        # group = Group.objects.get(name='SellerOwners')
         store = Store.objects.get(owner=user)
         self.store = store
         try:
@@ -120,6 +119,7 @@ class SellerRegisterSerializer(serializers.ModelSerializer):
         return user
 
     def to_representation(self, instance):
+        # method to return store as response
         rep = super().to_representation(instance)
         store = getattr(self, 'store', None)
         if store:
@@ -218,6 +218,9 @@ class VerifyOTPSerializer(serializers.Serializer):
 
 
 class LogOutSerializer(serializers.ModelSerializer):
+    """
+    serializer for logout
+    """
     refresh = serializers.CharField()
 
     class Meta:
@@ -236,6 +239,9 @@ class LogOutSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
+    """
+    serializer for change password
+    """
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True, validators=[validate_password])
     new_password2 = serializers.CharField(required=True)
@@ -247,6 +253,9 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    """
+    serializer for user detail
+    """
     groups = serializers.SlugRelatedField(
         many=True,
         read_only=True,
@@ -261,6 +270,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class PhoneLoginRequestSerializer(serializers.Serializer):
+    """
+    serializer for login with phone number
+    """
     phone = serializers.CharField(required=True)
 
     def validate(self, attrs):
@@ -276,6 +288,9 @@ class PhoneLoginRequestSerializer(serializers.Serializer):
 
 
 class PhoneVerifyOTPSerializer(serializers.Serializer):
+    """
+    serializer for OTP verification
+    """
     phone = serializers.CharField()
     otp = serializers.CharField(min_length=6, max_length=6, write_only=True)
     token = serializers.SerializerMethodField()
@@ -316,6 +331,9 @@ class PhoneVerifyOTPSerializer(serializers.Serializer):
 
 
 class AddressSerializer(serializers.ModelSerializer):
+    """
+    serializer for user address
+    """
     class Meta:
         model = Address
         fields = ['id', 'address_line', 'city', 'province', 'postal_code', 'country', 'is_default']
@@ -328,16 +346,25 @@ class AddressSerializer(serializers.ModelSerializer):
         return Address.objects.create(**validated_data)
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
+    """
+    serializer for customer profile
+    """
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'gender', 'profile_img']
 
 class SellerProfileSerializer(serializers.ModelSerializer):
+    """
+    serializer for seller profile
+    """
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'gender', 'profile_img']
 
 class SellerChangePasswordSerializer(serializers.Serializer):
+    """
+    serializer for seller change password
+    """
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True, validators=[validate_password])
     new_password2 = serializers.CharField(required=True)

@@ -1,6 +1,3 @@
-from django.shortcuts import render
-from rest_framework.authentication import SessionAuthentication
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import viewsets, permissions,generics,views
 from .models import Orders,OrderItems,CartItem,Cart
 from .serializers import OrderSerializer,OrderItemSerializer,CartSerializer,CartItemSerializer
@@ -19,11 +16,13 @@ import datetime
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
-from .service import Cart,CART_SESSION_ID
 import json
 # Create your views here.
 
 class CustomerOrderHistoryView(generics.ListAPIView):
+    """
+    view for listing customer order's history
+    """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -31,6 +30,9 @@ class CustomerOrderHistoryView(generics.ListAPIView):
         return Orders.objects.filter(customer=self.request.user)
 
 class CustomerOrderDetailsView(generics.ListAPIView):
+    """
+    view for listing customer order's details includes orderitems
+    """
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
 
@@ -39,6 +41,8 @@ class CustomerOrderDetailsView(generics.ListAPIView):
         order_id = self.kwargs.get('pk')  # Use 'pk' to match the URL parameter
         return OrderItems.objects.filter(order_id=order_id)
 
+
+#TODO - refactor this part
 def get_user_store(user):
     if user.groups.filter(name='SellerOwners').exists():
         try:
@@ -53,8 +57,11 @@ def get_user_store(user):
     except Exception:
         raise Exception('Not assigned to a store')
 
-
+#TODO implementing Front pages
 class CustomerAddressesAPIView(views.APIView):
+    """
+    view for retrieving customer address for buy products
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = AddressSerializer
     model = Address
@@ -67,8 +74,11 @@ class CustomerAddressesAPIView(views.APIView):
             return Response(serializer.data)
         return Response({'cart': "empty"})
 
-
+#TODO implementing Front pages
 class AddAddressAPIView(views.APIView):
+    """
+        view for retrieve and select customer address for buy products
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = AddressSerializer
     model = Address
@@ -90,6 +100,9 @@ class AddAddressAPIView(views.APIView):
         return Response(serializer.data, status=HTTP_200_OK)
 
 class OrdersListAPIView(generics.ListAPIView):
+    """
+    view for listing orders for a specific store seller
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer
     queryset = Orders.objects.all()
@@ -97,6 +110,9 @@ class OrdersListAPIView(generics.ListAPIView):
 
 
 class SellerOrderListView(generics.ListCreateAPIView):
+    """
+        view for listing orders for a specific store seller
+    """
     permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
     serializer_class = OrderSerializer
 
@@ -105,6 +121,9 @@ class SellerOrderListView(generics.ListCreateAPIView):
         return store.orders.all()
 
 class SellerOrderUpdateView(generics.UpdateAPIView):
+    """
+    view for update orders for a specific store
+    """
     permission_classes = [permissions.IsAuthenticated,IsStoreOwnerOrManager]
     serializer_class = OrderSerializer
 
@@ -120,6 +139,10 @@ class SellerOrderUpdateView(generics.UpdateAPIView):
 
 
 class CheckoutView(generics.CreateAPIView):
+    """
+    not a real checkout view,this view just take data of shopping cart from front-end and
+    create order,orderitems
+    """
     permission_classes = [IsAuthenticated, IsCustomer]
 
     @transaction.atomic
@@ -131,19 +154,20 @@ class CheckoutView(generics.CreateAPIView):
             cd = request.data.get(item)
             print("[DEBUG] cart_data:", cd)
 
-        # 1. Extract cart from POST payload
+        # get cart from POST request
         cart_data = request.data.get('cart')
         print("[DEBUG] cart_data:", cart_data)
         if not isinstance(cart_data, dict) or not cart_data:
             print("[DEBUG] Empty or invalid cart_data")
             return Response({"error": "Cart is empty or invalid"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 2. Create Order
+        # Create Order
         user = request.user
         try:
             address = Address.objects.get(customer=user)
         except Address.DoesNotExist:
             return Response({"error": "Shipping address not found"}, status=status.HTTP_400_BAD_REQUEST)
+        #TODO - refactor code for select store automatically
         store = Store.objects.get(id=3)  # adjust as needed
 
         order = Orders.objects.create(
@@ -156,7 +180,7 @@ class CheckoutView(generics.CreateAPIView):
         )
         print("[DEBUG] Created order id:", order.id)
 
-        # 3. Process each cart item
+        # looping through each cart item
         total_amount = Decimal('0.00')
         for prod_id_str, item in cart_data.items():
             print(f"[DEBUG] Processing cart item: {prod_id_str} -> {item}")
@@ -180,7 +204,7 @@ class CheckoutView(generics.CreateAPIView):
                 print(f"[DEBUG] Product {prod_id} does not exist")
                 return Response({"error": f"Product {prod_id} does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Create OrderItem; manager sets price if not provided
+            # Create OrderItem
             order_item = OrderItems.objects.create(
                 order=order,
                 product=product,
@@ -196,11 +220,11 @@ class CheckoutView(generics.CreateAPIView):
             product.save()
             print(f"after change-->{product.quantity}")
 
-        # 4. Finalize order total
+        # set order total amount
         order.total_amount = total_amount
         order.save()
         print(f"[DEBUG] Order {order.id} saved with total_amount {order.total_amount}")
 
-        # 5. Respond
+
         serializer = OrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

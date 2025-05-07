@@ -14,8 +14,11 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def send_otp_email(email, verification_code):
+    """
+    send otp email
+    """
     try:
-        print(f"Attempting to send email to {email} using host {settings.EMAIL_HOST}")
+        print(f"trying to send email to {email} using host {settings.EMAIL_HOST}")
         send_mail(
             'Verification Code',
             f'Your verification code is: {verification_code}',
@@ -33,8 +36,7 @@ def send_otp_email(email, verification_code):
 @shared_task
 def clear_expired_otp_codes():
     """
-    Clear expired OTP codes from UserProfile models
-    This function runs as a scheduled Celery task
+    Clear expired OTP codes from UserProfile models as scheduled Celery task
     """
     try:
         # Get profiles with non-null OTP and expired time
@@ -62,15 +64,18 @@ def clear_expired_otp_codes():
 
 @shared_task
 def send_sms_otp(phone, verification_code):
+    """
+    send otp to phone
+    """
     try:
         api = KavenegarAPI('737A32324148544D6443506B356F37677670594D495A3076516F6E72793243324F45467442727A706D48513D')
         params = {'sender': '2000660110', 'receptor': f'{phone}', 'message': f'{verification_code}کداعتبارسنجی تلفن همراه شما:'}
         response = api.sms_send(params)
         print(response)
-        print(f"SMS sent to {params['receptor']}: {params['message']}")
+        logger.info(f"SMS sent to {params['receptor']}: {params['message']}")
         return response
     except Exception as e:
-        print(f"Failed to send SMS to {phone}: {str(e)}")
+        logger.error(f"Failed to send SMS to {phone}: {str(e)}")
         return False
 
 

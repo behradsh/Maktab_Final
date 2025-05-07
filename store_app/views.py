@@ -1,6 +1,4 @@
-from django.shortcuts import render
 from rest_framework.permissions import BasePermission, IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
 from core_app.custom_permissions import *
 from django.views.generic import TemplateView
 from users_app.models import CustomUser
@@ -28,6 +26,9 @@ def get_user_store(user):
 
 
 class SellerStoreRetrieveView(generics.RetrieveAPIView):
+    """
+    view for retrieving user store details
+    """
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
     serializer_class = StoreSerializer
 
@@ -44,6 +45,9 @@ class SellerStoreRetrieveView(generics.RetrieveAPIView):
         })
 
 class SellerStoreUpdateView(generics.UpdateAPIView):
+    """
+    view for updating user store details
+    """
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
     serializer_class = StoreSerializer
 
@@ -72,6 +76,9 @@ class SellerStoreUpdateView(generics.UpdateAPIView):
         })
 
 class StoreEmployeeCreateView(generics.CreateAPIView):
+    """
+    view for creating store employees
+    """
     serializer_class = StoreEmployeeCreateSerializer
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
 
@@ -83,6 +90,9 @@ class StoreEmployeeCreateView(generics.CreateAPIView):
         serializer.save(store_id=store)
 
 class StoreEmployeeListView(generics.ListAPIView):
+    """
+    view for retrieving store employees
+    """
     serializer_class = StoreEmployeeSerializer
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
 
@@ -90,12 +100,14 @@ class StoreEmployeeListView(generics.ListAPIView):
         return StoreEmployee.objects.filter(store_id__owner=self.request.user)
 
 class StoreEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    view for retrieve and delete store employees
+    """
     permission_classes = [permissions.IsAuthenticated, IsStoreOwnerOrManager]
     serializer_class = StoreEmployeeSerializer
     lookup_field = 'pk'
 
     def get_queryset(self):
-        # Only allow operations on employees of the store owned by current user
         try:
             store = Store.objects.get(owner=self.request.user)
             return StoreEmployee.objects.filter(store_id=store).select_related('user_id', 'store_id')
@@ -103,13 +115,13 @@ class StoreEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
             return StoreEmployee.objects.none()
 
     def perform_update(self, serializer):
-        # Prevent changing the store association
+        # Not changing the store association
         if 'store_id' in serializer.validated_data:
             raise serializers.ValidationError(
                 {"store_id": _("Cannot change store association.")}
             )
 
-        # Prevent removing all roles
+        # Not removing all roles
         instance = self.get_object()
         new_data = serializer.validated_data
         if not new_data.get('is_manager', instance.is_manager) and not new_data.get('is_operator',
@@ -121,7 +133,7 @@ class StoreEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
         serializer.save()
 
     def perform_destroy(self, instance):
-        # Check if this is the last manager
+        # Check if it is the last manager
         if instance.is_manager:
             managers_count = StoreEmployee.objects.filter(
                 store_id=instance.store_id,
@@ -143,6 +155,9 @@ class StoreEmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
 
 
 class StoreListView(generics.ListAPIView):
+    """
+    view for listing user store
+    """
     permission_classes = [permissions.AllowAny]
     serializer_class = StoreSerializer
 
@@ -151,6 +166,9 @@ class StoreListView(generics.ListAPIView):
         return stores
 
 class StoreDetailView(generics.RetrieveAPIView):
+    """
+    view for retrieving user store details
+    """
     permission_classes = [permissions.AllowAny]
     serializer_class = StoreSerializer
 
@@ -160,7 +178,7 @@ class StoreDetailView(generics.RetrieveAPIView):
 
 
 
-
+############### TEMPLATES ####################
 class StoreDetailsPageTemplate(TemplateView):
     template_name = 'main/stores_detail.html'
 

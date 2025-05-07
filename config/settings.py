@@ -253,7 +253,7 @@ CELERY_TIMEZONE = 'UTC'  # Set to your timezone
 CELERY_BEAT_SCHEDULE = {
     'clear-expired-otp-codes': {
         'task': 'users_app.tasks.clear_expired_otp_codes',
-        'schedule': 3600.0,  # Run every hour (in seconds)
+        'schedule': 3600.0,  # every hour (in seconds)
     },
 }
 # Automatic retry for failed tasks
@@ -321,4 +321,3 @@ LOGGING = {
     },
 }
 logging.config.dictConfig(LOGGING) # Finally replace our config in python logging
-# LOGIN_URL = 'token_obtain_pair'

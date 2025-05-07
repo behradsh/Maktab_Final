@@ -15,6 +15,9 @@ from django.contrib import messages
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    """
+    serializer for the OrderItem model
+    """
     product = ProductSerializer()
 
     class Meta:
@@ -23,6 +26,9 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    """
+    serializer for the Order model
+    """
     store = StoreSerializer(read_only=True)
     store_id = serializers.PrimaryKeyRelatedField(
         queryset=Store.objects.all(), source='store', write_only=True
@@ -46,6 +52,9 @@ class OrderSerializer(serializers.ModelSerializer):
         return obj.updated_at_shamsi
 
 class CartItemSerializer(serializers.ModelSerializer):
+    """
+    serializer for the CartItem model
+    """
     product = ProductSerializer(read_only=True)
     product_id = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.all(), source='product', write_only=True
@@ -70,6 +79,9 @@ class CartItemSerializer(serializers.ModelSerializer):
         return data
 
 class CartSerializer(serializers.ModelSerializer):
+    """
+    serializer for the Cart model
+    """
     items = CartItemSerializer(many=True, read_only=True)
     created_at_shamsi = serializers.SerializerMethodField()
     updated_at_shamsi = serializers.SerializerMethodField()

@@ -37,11 +37,12 @@ class Category(models.Model):
             created_shamsi = jdatetime.datetime.fromgregorian(datetime=self.created_at).strftime('%Y-%m-%d %H:%M:%S')
             return created_shamsi
         return None
+
     def num_of_products(self):
         category = Category.objects.get(pk=self.pk)
         num_of_products = Product.objects.filter(category=category).count()
         num_of_sub_products = Product.objects.filter(category__parent=category).count()
-        return (num_of_products+num_of_sub_products)
+        return (num_of_products + num_of_sub_products)
 
 
 class Product(models.Model):
@@ -56,6 +57,7 @@ class Product(models.Model):
     is_active = models.BooleanField(_("Active"), default=True)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
+
     class Meta:
         verbose_name_plural = _("Products")
 
@@ -72,6 +74,7 @@ class Product(models.Model):
             updated_shamsi = jdatetime.datetime.fromgregorian(datetime=self.updated_at).strftime('%Y-%m-%d %H:%M:%S')
             return updated_shamsi
         return None
+
 
 class Comment(models.Model):
     RATE_CHOICES = (
