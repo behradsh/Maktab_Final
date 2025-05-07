@@ -168,7 +168,7 @@ class CheckoutView(generics.CreateAPIView):
         except Address.DoesNotExist:
             return Response({"error": "Shipping address not found"}, status=status.HTTP_400_BAD_REQUEST)
         #TODO - refactor code for select store automatically
-        store = Store.objects.get(id=3)  # adjust as needed
+        store = Store.objects.get(id=3)
 
         order = Orders.objects.create(
             customer=user,
