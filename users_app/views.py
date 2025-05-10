@@ -675,6 +675,12 @@ class SellerReportsView(generics.GenericAPIView):
 class HomeTemplate(TemplateView):
     template_name = 'main/home_test.html'
 
+class HomeEnglishTemplate(TemplateView):
+    template_name = 'main/home_test_english.html'
+
+class HomePersianTemplate(TemplateView):
+    template_name = 'main/home_test_persian.html'
+
 
 class LoginTemplateView(TemplateView):
     template_name = "auth/customer_login_username.html"

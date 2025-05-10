@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-06 02:22+0330\n"
+"POT-Creation-Date: 2025-05-10 15:42+0330\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,7 +66,7 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: orders_app/models.py:22 products_app/models.py:90
+#: orders_app/models.py:22 products_app/models.py:93
 msgid "Status"
 msgstr ""
 
@@ -82,12 +82,12 @@ msgstr ""
 msgid "Total Amount"
 msgstr ""
 
-#: orders_app/models.py:27 products_app/models.py:57 products_app/models.py:92
+#: orders_app/models.py:27 products_app/models.py:58 products_app/models.py:95
 #: store_app/models.py:11 store_app/models.py:46
 msgid "Created at"
 msgstr ""
 
-#: orders_app/models.py:28 products_app/models.py:58 products_app/models.py:93
+#: orders_app/models.py:28 products_app/models.py:59 products_app/models.py:96
 #: store_app/models.py:15
 msgid "Updated at"
 msgstr ""
@@ -96,11 +96,11 @@ msgstr ""
 msgid "Orders"
 msgstr ""
 
-#: orders_app/models.py:62 products_app/models.py:55
+#: orders_app/models.py:62 products_app/models.py:56
 msgid "Quantity"
 msgstr ""
 
-#: orders_app/models.py:63 products_app/models.py:53
+#: orders_app/models.py:63 products_app/models.py:54
 msgid "Price"
 msgstr ""
 
@@ -128,7 +128,7 @@ msgstr ""
 msgid "Parent Category"
 msgstr ""
 
-#: products_app/models.py:23
+#: products_app/models.py:23 templates/main/home_test.html:266
 msgid "Category"
 msgstr ""
 
@@ -136,55 +136,55 @@ msgstr ""
 msgid "Categories"
 msgstr ""
 
-#: products_app/models.py:48
+#: products_app/models.py:49
 msgid "Product Name"
 msgstr ""
 
-#: products_app/models.py:51
+#: products_app/models.py:52
 msgid "Brand Name"
 msgstr ""
 
-#: products_app/models.py:52
+#: products_app/models.py:53
 msgid "Description"
 msgstr ""
 
-#: products_app/models.py:54
+#: products_app/models.py:55
 msgid "Image"
 msgstr ""
 
-#: products_app/models.py:56 store_app/models.py:14
+#: products_app/models.py:57 store_app/models.py:14
 msgid "Active"
 msgstr ""
 
-#: products_app/models.py:60
+#: products_app/models.py:62
 msgid "Products"
 msgstr ""
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "approved"
 msgstr ""
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "Approved"
 msgstr ""
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "waiting"
 msgstr ""
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "Waiting"
 msgstr ""
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "deny"
 msgstr ""
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "Deny"
 msgstr ""
 
-#: products_app/models.py:96
+#: products_app/models.py:99
 msgid "Comments"
 msgstr ""
 
@@ -212,7 +212,7 @@ msgstr ""
 msgid "Store"
 msgstr ""
 
-#: store_app/models.py:19
+#: store_app/models.py:19 templates/main/home_test.html:223
 msgid "Stores"
 msgstr ""
 
@@ -224,28 +224,187 @@ msgstr ""
 msgid "Operator"
 msgstr ""
 
-#: store_app/serializers.py:100
+#: store_app/serializers.py:118
 msgid "User does not exist."
 msgstr ""
 
-#: store_app/serializers.py:101
+#: store_app/serializers.py:119
 msgid "User ID is required."
 msgstr ""
 
-#: store_app/serializers.py:137 store_app/views.py:118
+#: store_app/serializers.py:155 store_app/views.py:130
 msgid "Employee must have at least one role (manager or operator)."
 msgstr ""
 
-#: store_app/serializers.py:141
+#: store_app/serializers.py:159
 msgid "User cannot be both manager and operator."
 msgstr ""
 
-#: store_app/views.py:109
+#: store_app/views.py:121
 msgid "Cannot change store association."
 msgstr ""
 
-#: store_app/views.py:132
+#: store_app/views.py:144
 msgid "Cannot delete the last manager of the store."
+msgstr ""
+
+#: templates/main/home_test.html:6 templates/main/home_test_english.html:6
+msgid "FoodMart"
+msgstr ""
+
+#: templates/main/home_test.html:92 templates/main/home_test.html:191
+#: templates/main/home_test_english.html:98
+msgid "Your Cart"
+msgstr ""
+
+#: templates/main/home_test.html:101
+msgid "Continue to checkout"
+msgstr ""
+
+#: templates/main/home_test.html:113 templates/main/home_test_english.html:55
+msgid "Search"
+msgstr ""
+
+#: templates/main/home_test.html:139 templates/main/home_test_english.html:46
+msgid "All Categories"
+msgstr ""
+
+#: templates/main/home_test.html:140 templates/main/home_test_english.html:47
+msgid "Groceries"
+msgstr ""
+
+#: templates/main/home_test.html:141 templates/main/home_test_english.html:48
+msgid "Drinks"
+msgstr ""
+
+#: templates/main/home_test.html:142 templates/main/home_test_english.html:49
+msgid "Chocolates"
+msgstr ""
+
+#: templates/main/home_test.html:218
+msgid "Shop by Departments"
+msgstr ""
+
+#: templates/main/home_test.html:226
+msgid "Men"
+msgstr ""
+
+#: templates/main/home_test.html:229
+msgid "Kids"
+msgstr ""
+
+#: templates/main/home_test.html:232
+msgid "Accessories"
+msgstr ""
+
+#: templates/main/home_test.html:235
+msgid "LogIn Pages"
+msgstr ""
+
+#: templates/main/home_test.html:237
+msgid "Customer"
+msgstr ""
+
+#: templates/main/home_test.html:238
+msgid "Seller"
+msgstr ""
+
+#: templates/main/home_test.html:242
+msgid "Brand"
+msgstr ""
+
+#: templates/main/home_test.html:245
+msgid "Sale"
+msgstr ""
+
+#: templates/main/home_test.html:248
+msgid "Blog"
+msgstr ""
+
+#: templates/main/home_test.html:269
+msgid "View All Categories"
+msgstr ""
+
+#: templates/main/home_test.html:303 templates/main/home_test_english.html:116
+msgid "Trending Products"
+msgstr ""
+
+#: templates/main/home_test.html:315 templates/main/home_test_english.html:128
+msgid "Order by Create"
+msgstr ""
+
+#: templates/main/home_test.html:316 templates/main/home_test_english.html:129
+msgid "Order by Price"
+msgstr ""
+
+#: templates/main/home_test.html:346 templates/main/home_test_english.html:159
+msgid "Add to Cart"
+msgstr ""
+
+#: templates/main/home_test.html:420
+msgid "About us"
+msgstr ""
+
+#: templates/main/home_test.html:423
+msgid "Conditions"
+msgstr ""
+
+#: templates/main/home_test.html:426
+msgid "Our Journals"
+msgstr ""
+
+#: templates/main/home_test.html:429
+msgid "Careers"
+msgstr ""
+
+#: templates/main/home_test.html:432
+msgid "Affiliate Programme"
+msgstr ""
+
+#: templates/main/home_test.html:435
+msgid "Ultras Press"
+msgstr ""
+
+#: templates/main/home_test.html:448 templates/main/home_test_english.html:220
+msgid "© 2023 Foodmart. All rights reserved."
+msgstr ""
+
+#: templates/main/home_test_english.html:37
+#: templates/main/home_test_english.html:195
+msgid "logo"
+msgstr ""
+
+#: templates/main/home_test_english.html:54
+msgid "Search for more than 20,000 products"
+msgstr ""
+
+#: templates/main/home_test_english.html:119
+msgid "All"
+msgstr ""
+
+#: templates/main/home_test_english.html:135
+#, python-format
+msgid "-10%%"
+msgstr ""
+
+#: templates/main/home_test_english.html:138
+msgid "Product Title"
+msgstr ""
+
+#: templates/main/home_test_english.html:142
+msgid "Sunstar Fresh Melon Juice"
+msgstr ""
+
+#: templates/main/home_test_english.html:143
+msgid "1 Unit"
+msgstr ""
+
+#: templates/main/home_test_english.html:143
+msgid "4.5"
+msgstr ""
+
+#: templates/main/home_test_english.html:144
+msgid "$18.00"
 msgstr ""
 
 #: users_app/models.py:13
@@ -580,15 +739,15 @@ msgstr ""
 msgid "Invalid credentials, try again"
 msgstr ""
 
-#: users_app/serializers.py:149 users_app/serializers.py:271
+#: users_app/serializers.py:149 users_app/serializers.py:283
 msgid "Account disabled, contact admin"
 msgstr ""
 
-#: users_app/serializers.py:205 users_app/serializers.py:305
+#: users_app/serializers.py:205 users_app/serializers.py:320
 msgid "Invalid verification code"
 msgstr ""
 
-#: users_app/serializers.py:208 users_app/serializers.py:308
+#: users_app/serializers.py:208 users_app/serializers.py:323
 msgid "Verification code has expired"
 msgstr ""
 
@@ -596,6 +755,6 @@ msgstr ""
 msgid "No user found with this email"
 msgstr ""
 
-#: users_app/serializers.py:275 users_app/serializers.py:315
+#: users_app/serializers.py:287 users_app/serializers.py:330
 msgid "No user found with this phone number"
 msgstr ""

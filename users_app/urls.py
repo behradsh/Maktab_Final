@@ -26,7 +26,8 @@ CustomerAddressEditTemplate,CustomerAddressCreateTemplate,
 CustomerRegisterTemplate,SellerRegisterTemplate,HomeTemplate,
 SellerDashboardTemplate,SellerDashboardChangePassTemplate,
 SellerOrderListView,SellerOrderUpdateView,SellerDashboardOrdersTemplate,
-SellerDashboardOrdersEditTemplate,CustomerOrderDetailsTemplate
+SellerDashboardOrdersEditTemplate,CustomerOrderDetailsTemplate,
+HomePersianTemplate,
                     )
 from orders_app.views import (CustomerOrderHistoryView,CustomerOrderDetailsView)
 from products_app.views import (CommentCreateView, UserCommentsListView)
@@ -52,6 +53,7 @@ router = DefaultRouter()
 urlpatterns = [
     # path('', HomeView.as_view(), name='home_page_api'),
     path('', HomeTemplate.as_view(), name='home_page'),
+    path('', HomePersianTemplate.as_view(), name='home_page_fa'),
     path('api/seller/dashboard/profile/', SellerProfileView.as_view(), name='seller_dashboard_api'),
     path('seller/dashboard/', SellerDashboardTemplate.as_view(), name='seller_dashboard'),
     path('api/register/customer/', CustomerRegisterView.as_view(), name='customer_register_api'),

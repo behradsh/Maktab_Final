@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-06 02:22+0330\n"
+"POT-Creation-Date: 2025-05-10 15:42+0330\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,7 +66,7 @@ msgstr "لغو شده"
 msgid "Cancelled"
 msgstr "لغو شده"
 
-#: orders_app/models.py:22 products_app/models.py:90
+#: orders_app/models.py:22 products_app/models.py:93
 msgid "Status"
 msgstr "وضعیت"
 
@@ -82,12 +82,12 @@ msgstr "تخفیف اعمال‌شده روی سفارش"
 msgid "Total Amount"
 msgstr "مبلغ کل"
 
-#: orders_app/models.py:27 products_app/models.py:57 products_app/models.py:92
+#: orders_app/models.py:27 products_app/models.py:58 products_app/models.py:95
 #: store_app/models.py:11 store_app/models.py:46
 msgid "Created at"
 msgstr "تاریخ ایجاد"
 
-#: orders_app/models.py:28 products_app/models.py:58 products_app/models.py:93
+#: orders_app/models.py:28 products_app/models.py:59 products_app/models.py:96
 #: store_app/models.py:15
 msgid "Updated at"
 msgstr "تاریخ به‌روزرسانی"
@@ -96,11 +96,11 @@ msgstr "تاریخ به‌روزرسانی"
 msgid "Orders"
 msgstr "سفارش‌ها"
 
-#: orders_app/models.py:62 products_app/models.py:55
+#: orders_app/models.py:62 products_app/models.py:56
 msgid "Quantity"
 msgstr "تعداد"
 
-#: orders_app/models.py:63 products_app/models.py:53
+#: orders_app/models.py:63 products_app/models.py:54
 msgid "Price"
 msgstr "قیمت"
 
@@ -128,7 +128,7 @@ msgstr "زیردسته‌ها"
 msgid "Parent Category"
 msgstr "دسته‌بندی والد"
 
-#: products_app/models.py:23
+#: products_app/models.py:23 templates/main/home_test.html:266
 msgid "Category"
 msgstr "دسته‌بندی"
 
@@ -136,55 +136,55 @@ msgstr "دسته‌بندی"
 msgid "Categories"
 msgstr "دسته‌بندی‌ها"
 
-#: products_app/models.py:48
+#: products_app/models.py:49
 msgid "Product Name"
 msgstr "نام محصول"
 
-#: products_app/models.py:51
+#: products_app/models.py:52
 msgid "Brand Name"
 msgstr "نام برند"
 
-#: products_app/models.py:52
+#: products_app/models.py:53
 msgid "Description"
 msgstr "توضیحات"
 
-#: products_app/models.py:54
+#: products_app/models.py:55
 msgid "Image"
 msgstr "تصویر"
 
-#: products_app/models.py:56 store_app/models.py:14
+#: products_app/models.py:57 store_app/models.py:14
 msgid "Active"
 msgstr "فعال"
 
-#: products_app/models.py:60
+#: products_app/models.py:62
 msgid "Products"
 msgstr "محصولات"
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "approved"
 msgstr "تایید شده"
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "Approved"
 msgstr "تایید شده"
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "waiting"
 msgstr "در انتظار"
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "Waiting"
 msgstr "در انتظار"
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "deny"
 msgstr "رد شده"
 
-#: products_app/models.py:83
+#: products_app/models.py:86
 msgid "Deny"
 msgstr "رد شده"
 
-#: products_app/models.py:96
+#: products_app/models.py:99
 msgid "Comments"
 msgstr "نظرات"
 
@@ -212,7 +212,7 @@ msgstr "لوگوی فروشگاه"
 msgid "Store"
 msgstr "فروشگاه"
 
-#: store_app/models.py:19
+#: store_app/models.py:19 templates/main/home_test.html:223
 msgid "Stores"
 msgstr "فروشگاه‌ها"
 
@@ -224,29 +224,206 @@ msgstr "مدیر"
 msgid "Operator"
 msgstr "اپراتور"
 
-#: store_app/serializers.py:100
+#: store_app/serializers.py:118
 msgid "User does not exist."
 msgstr "کاربر وجود ندارد."
 
-#: store_app/serializers.py:101
+#: store_app/serializers.py:119
 msgid "User ID is required."
 msgstr "شناسه کاربر الزامی است."
 
-#: store_app/serializers.py:137 store_app/views.py:118
+#: store_app/serializers.py:155 store_app/views.py:130
 msgid "Employee must have at least one role (manager or operator)."
 msgstr "کارمند باید حداقل یک نقش (مدیر یا اپراتور) داشته باشد."
 
-#: store_app/serializers.py:141
+#: store_app/serializers.py:159
 msgid "User cannot be both manager and operator."
 msgstr "یک کاربر نمی‌تواند هم مدیر و هم اپراتور باشد."
 
-#: store_app/views.py:109
+#: store_app/views.py:121
 msgid "Cannot change store association."
 msgstr "امکان تغییر وابستگی فروشگاه وجود ندارد."
 
-#: store_app/views.py:132
+#: store_app/views.py:144
 msgid "Cannot delete the last manager of the store."
 msgstr "امکان حذف آخرین مدیر فروشگاه وجود ندارد."
+
+#: templates/main/home_test.html:6 templates/main/home_test_english.html:6
+msgid "FoodMart"
+msgstr "فودمارت"
+
+#: templates/main/home_test.html:92 templates/main/home_test.html:191
+#: templates/main/home_test_english.html:98
+#, fuzzy
+#| msgid "Cart"
+msgid "Your Cart"
+msgstr "سبد خرید"
+
+#: templates/main/home_test.html:101
+msgid "Continue to checkout"
+msgstr "نهایی کردن سفارش"
+
+#: templates/main/home_test.html:113 templates/main/home_test_english.html:55
+msgid "Search"
+msgstr "جستجو"
+
+#: templates/main/home_test.html:139 templates/main/home_test_english.html:46
+#, fuzzy
+#| msgid "Categories"
+msgid "All Categories"
+msgstr "دسته‌بندی‌ها"
+
+#: templates/main/home_test.html:140 templates/main/home_test_english.html:47
+msgid "Groceries"
+msgstr "دسته بندی"
+
+#: templates/main/home_test.html:141 templates/main/home_test_english.html:48
+msgid "Drinks"
+msgstr "نوشیدنی"
+
+#: templates/main/home_test.html:142 templates/main/home_test_english.html:49
+msgid "Chocolates"
+msgstr "شکلات"
+
+#: templates/main/home_test.html:218
+msgid "Shop by Departments"
+msgstr "براساس دپارتمان"
+
+#: templates/main/home_test.html:226
+msgid "Men"
+msgstr "مردانه"
+
+#: templates/main/home_test.html:229
+msgid "Kids"
+msgstr "بچگانه"
+
+#: templates/main/home_test.html:232
+#, fuzzy
+#| msgid "Groceries"
+msgid "Accessories"
+msgstr "دسته بندی"
+
+#: templates/main/home_test.html:235
+msgid "LogIn Pages"
+msgstr "صفحات ورود"
+
+#: templates/main/home_test.html:237
+#, fuzzy
+#| msgid "customer status"
+msgid "Customer"
+msgstr "مشتری"
+
+#: templates/main/home_test.html:238
+msgid "Seller"
+msgstr "فروشنده"
+
+#: templates/main/home_test.html:242
+#, fuzzy
+#| msgid "Brand Name"
+msgid "Brand"
+msgstr "نام برند"
+
+#: templates/main/home_test.html:245
+msgid "Sale"
+msgstr "فروش"
+
+#: templates/main/home_test.html:248
+msgid "Blog"
+msgstr "بلاگ"
+
+#: templates/main/home_test.html:269
+#, fuzzy
+#| msgid "Categories"
+msgid "View All Categories"
+msgstr "دسته‌بندی‌ها"
+
+#: templates/main/home_test.html:303 templates/main/home_test_english.html:116
+#, fuzzy
+#| msgid "Products"
+msgid "Trending Products"
+msgstr "محصولات"
+
+#: templates/main/home_test.html:315 templates/main/home_test_english.html:128
+#, fuzzy
+#| msgid "Order Items"
+msgid "Order by Create"
+msgstr "آیتم‌های سفارش"
+
+#: templates/main/home_test.html:316 templates/main/home_test_english.html:129
+msgid "Order by Price"
+msgstr "براساس قیمت"
+
+#: templates/main/home_test.html:346 templates/main/home_test_english.html:159
+msgid "Add to Cart"
+msgstr "افزودن به سبد خرید"
+
+#: templates/main/home_test.html:420
+msgid "About us"
+msgstr "درباره ما"
+
+#: templates/main/home_test.html:423
+msgid "Conditions"
+msgstr "شرایط"
+
+#: templates/main/home_test.html:426
+msgid "Our Journals"
+msgstr "ژورنال ها"
+
+#: templates/main/home_test.html:429
+msgid "Careers"
+msgstr "خلاصه"
+
+#: templates/main/home_test.html:432
+msgid "Affiliate Programme"
+msgstr "برنامه راهبردی"
+
+#: templates/main/home_test.html:435
+msgid "Ultras Press"
+msgstr "متفرقه"
+
+#: templates/main/home_test.html:448 templates/main/home_test_english.html:220
+msgid "© 2023 Foodmart. All rights reserved."
+msgstr "حق کپی رایت محفوظ است"
+
+#: templates/main/home_test_english.html:37
+#: templates/main/home_test_english.html:195
+msgid "logo"
+msgstr "لوگو"
+
+#: templates/main/home_test_english.html:54
+msgid "Search for more than 20,000 products"
+msgstr "جستجو"
+
+#: templates/main/home_test_english.html:119
+msgid "All"
+msgstr "همه"
+
+#: templates/main/home_test_english.html:135
+#, python-format
+msgid "-10%%"
+msgstr ""
+
+#: templates/main/home_test_english.html:138
+#, fuzzy
+#| msgid "Product Name"
+msgid "Product Title"
+msgstr "نام محصول"
+
+#: templates/main/home_test_english.html:142
+msgid "Sunstar Fresh Melon Juice"
+msgstr "نوشیدنی سان استار"
+
+#: templates/main/home_test_english.html:143
+msgid "1 Unit"
+msgstr ""
+
+#: templates/main/home_test_english.html:143
+msgid "4.5"
+msgstr ""
+
+#: templates/main/home_test_english.html:144
+msgid "$18.00"
+msgstr ""
 
 #: users_app/models.py:13
 msgid "tehran"
@@ -580,15 +757,15 @@ msgstr "پیش‌فرض"
 msgid "Invalid credentials, try again"
 msgstr "اعتبارسنجی ناموفق، دوباره تلاش کنید"
 
-#: users_app/serializers.py:149 users_app/serializers.py:271
+#: users_app/serializers.py:149 users_app/serializers.py:283
 msgid "Account disabled, contact admin"
 msgstr "حساب غیرفعال است، با مدیر تماس بگیرید"
 
-#: users_app/serializers.py:205 users_app/serializers.py:305
+#: users_app/serializers.py:205 users_app/serializers.py:320
 msgid "Invalid verification code"
 msgstr "کد تأیید نامعتبر"
 
-#: users_app/serializers.py:208 users_app/serializers.py:308
+#: users_app/serializers.py:208 users_app/serializers.py:323
 msgid "Verification code has expired"
 msgstr "کد تأیید منقضی شده است"
 
@@ -596,7 +773,7 @@ msgstr "کد تأیید منقضی شده است"
 msgid "No user found with this email"
 msgstr "هیچ کاربری با این ایمیل یافت نشد"
 
-#: users_app/serializers.py:275 users_app/serializers.py:315
+#: users_app/serializers.py:287 users_app/serializers.py:330
 msgid "No user found with this phone number"
 msgstr "هیچ کاربری با این شماره تلفن یافت نشد"
 
