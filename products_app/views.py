@@ -4,6 +4,9 @@ from django.http import JsonResponse
 from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from rest_framework import generics, permissions
+from .filters import ProductFilter
+from rest_framework.filters import OrderingFilter,SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import (Category, Product, Comment)
 from .serializers import (CategorySerializer, ProductSerializer, CommentSerializer)
 from core_app.custom_permissions import *
@@ -115,8 +118,13 @@ class StorePageProductDetails(generics.ListAPIView):
     """
     view for listing Products of a specific store
     """
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = []
+    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
+    filterset_class = ProductFilter
+    search_fields = ['name','brand',]
+    ordering_fields = ['created_at','price',]
 
     def get_queryset(self):
         store_id = self.kwargs.get('pk')
@@ -131,6 +139,10 @@ class ProductListHomeView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = []
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ProductFilter
+    search_fields = ['name', 'brand', ]
+    ordering_fields = ['created_at', 'price', ]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -208,7 +220,7 @@ def search_products(request):
     query = request.GET.get('q', '')  # Search Query
     if query:
         products = Product.objects.filter(
-            Q(name__icontains=query) | Q(brand__icontains=query)
+            Q(name__icontains=query) | Q(brand__icontains=query) | Q(store__name__icontains=query)
         )
     else:
         products = Product.objects.all()

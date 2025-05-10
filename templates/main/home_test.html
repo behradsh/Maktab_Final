@@ -232,20 +232,10 @@
                       <a href="#accessories" class="nav-link">Accessories</a>
                     </li>
                     <li class="nav-item dropdown">
-                      <a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown" aria-expanded="false">Pages</a>
+                      <a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown" aria-expanded="false">LogIn Pages</a>
                       <ul class="dropdown-menu" aria-labelledby="pages">
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">About Us </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Shop </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Single Product </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Cart </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Checkout </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Blog </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Single Post </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Styles </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Contact </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Thank You </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">My Account </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">404 Error </a></li>
+                        <li><a href="{% url 'login_customer'%}" class="dropdown-item">Customer </a></li>
+                        <li><a href="{% url 'login_seller'%}" class="dropdown-item">Seller </a></li>
                       </ul>
                     </li>
                     <li class="nav-item">
@@ -321,6 +311,11 @@
                 <div class="tab-pane fade show active" id="nav-all" role="tabpanel" aria-labelledby="nav-all-tab">
 
                   <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5" id="product_grid">
+                    <div class="d-flex justify-content-center mb-4">
+                      <button id="create_ordering" class="btn btn-primary me-2">Order by Create</button>
+                      <button id="price_ordering" class="btn btn-secondary">Order by Price</button>
+                  </div>
+                    
                   
                     <div class="col">
                       <div class="product-item">
@@ -512,39 +507,39 @@
                 //container.innerHTML = '';
     
                 products.forEach(product => {
-                    const imageUrl = product.image || "{% static 'main/images/thumb-avocado.png' %}";
-                    container.innerHTML += `
-                        <div class="col">
-                            <div class="product-item">
-                                <a href="#" class="btn-wishlist"><svg width="24" height="24"><use xlink:href="#heart"></use></svg></a>
-                                <figure>
-                                    <a href="product/${product.id}/" title="${product.name}">
-                                        <img src="${imageUrl}" class="tab-image" alt="${product.name}">
-                                    </a>
-                                </figure>
-                                <h3>${product.name}</h3>
-                                <span class="qty">1 Unit</span><span class="rating"><svg width="24" height="24" class="text-primary"><use xlink:href="#star-solid"></use></svg> 4.5</span>
-                                <span class="price">$${product.price}</span>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="input-group product-qty">
-                                        <span class="input-group-btn">
-                                            <button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus">
-                                                <svg width="16" height="16"><use xlink:href="#minus"></use></svg>
-                                            </button>
-                                        </span>
-                                        <input type="text" id="quantity" name="quantity" class="form-control input-number quantity-input" value="1">
-                                        <span class="input-group-btn">
-                                            <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus">
-                                                <svg width="16" height="16"><use xlink:href="#plus"></use></svg>
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <a href="#" id="addtocart" class="nav-link" data-product-id=${product.id}>Add to Cart <iconify-icon icon="uil:shopping-cart"></a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
+                  const imageUrl = product.image || "{% static 'main/images/thumb-avocado.png' %}";
+                  container.innerHTML += `
+                      <div class="col">
+                          <div class="product-item">
+                              <a href="#" class="btn-wishlist"><svg width="24" height="24"><use xlink:href="#heart"></use></svg></a>
+                              <figure>
+                                  <a href="product/${product.id}/" title="${product.name}">
+                                      <img src="${imageUrl}" class="tab-image" alt="${product.name}">
+                                  </a>
+                              </figure>
+                              <h3>${product.name}</h3>
+                              <span class="qty">1 Unit</span><span class="rating"><svg width="24" height="24" class="text-primary">< xlink:href="#star-solid"></use></svg> 4.5</span>
+                              <span class="price">$${product.price}</span>
+                              <div class="d-flex align-items-center justify-content-between">
+                                  <div class="input-group product-qty">
+                                      <span class="input-group-btn">
+                                          <button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus">
+                                              <svg width="16" height="16"><use xlink:href="#minus"></use></svg>
+                                          </button>
+                                      </span>
+                                      <input type="text" id="quantity" name="quantity" class="form-control input-number quantity-input" value="1">
+                                      <span class="input-group-btn">
+                                          <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus">
+                                              <svg width="16" height="16"><use xlink:href="#plus"></use></svg>
+                                          </button>
+                                      </span>
+                                  </div>
+                                  <a href="#" id="addtocart" class="nav-link" data-product-id=${product.id}>Add to Cart <iconify-icon icon="uil:shopping-cart"></a>
+                              </div>
+                          </div>
+                      </div>
+                  `;
+              });
     
                 // Initialize quantity controls for newly added products
                 initProductQty();

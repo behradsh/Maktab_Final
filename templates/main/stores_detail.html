@@ -164,11 +164,12 @@
               </div>
               <div class="col-11 col-md-7">
                 <form id="search-form" class="text-center" action="index.html" method="post">
-                  <input type="text" class="form-control border-0 bg-transparent" placeholder="Search for more than 20,000 products" />
+                  <input type="text" id="search-input" class="form-control border-0 bg-transparent" placeholder="Search for more than 20,000 products" />
+                              </form>
                 </form>
               </div>
               <div class="col-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7a7 7 0 0 1-7 7Z"/></svg>
+                <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7a7 7 0 0 1-7 7Z"/></svg>
               </div>
             </div>
           </div>
@@ -249,20 +250,10 @@
                       <a href="#accessories" class="nav-link">Accessories</a>
                     </li>
                     <li class="nav-item dropdown">
-                      <a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown" aria-expanded="false">Pages</a>
+                      <a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown" aria-expanded="false">LogIn Pages</a>
                       <ul class="dropdown-menu" aria-labelledby="pages">
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">About Us </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Shop </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Single Product </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Cart </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Checkout </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Blog </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Single Post </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Styles </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Contact </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">Thank You </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">My Account </a></li>
-                        <li><a href="{% url 'home_page'}" class="dropdown-item">404 Error </a></li>
+                        <li><a href="{% url 'login_customer'%}" class="dropdown-item">Customer </a></li>
+                        <li><a href="{% url 'login_seller'%}" class="dropdown-item">Seller </a></li>
                       </ul>
                     </li>
                     <li class="nav-item">
@@ -316,7 +307,21 @@
             <div class="tab-content" id="nav-tabContent">
               <div class="tab-pane fade show active" id="nav-all" role="tabpanel" aria-labelledby="nav-all-tab">
 
-                <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5" id="product_grid">
+                <section class="py-5">
+                  <div class="container-fluid">
+                      <div class="row mb-4">
+                          <div class="col text-center">
+                              <button id="create_ordering" class="btn btn-primary me-2">Order by Create</button>
+                              <button id="price_ordering" class="btn btn-secondary">Order by Price</button>
+                          </div>
+                      </div>
+                      <div class="row">
+                          <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5" id="product_grid">
+                              <!-- Products will be dynamically added here -->
+                          </div>
+                      </div>
+                  </div>
+              </section>
               
 
 
@@ -511,9 +516,49 @@
               // Clear existing content (optional, depending on your needs)
               //container.innerHTML = '';
   
+              
+  
+              // Initialize quantity controls for newly added products
+              initProductQty();
+          })
+          .catch(error => {
+              console.error('Error fetching products:', error);
+              document.getElementById('product_grid').innerHTML = `
+                  <div class="alert alert-danger">
+                      Failed to load products. Please try again later.
+                  </div>
+              `;
+          });
+  
+      // Initialize quantity controls for any static product items
+      initProductQty();
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const storeId = window.location.pathname.split('/').filter(Boolean).pop(); // Extract store ID from URL
+      const productGrid = document.getElementById('product_grid');
+
+      // Function to fetch and display products
+      async function fetchAndDisplayProducts(ordering = '') {
+          try {
+              const response = await fetch(`http://127.0.0.1:8000/en/api/store/products/${storeId}/?ordering=${ordering}`, {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+              });
+
+              if (!response.ok) {
+                  throw new Error('Failed to fetch products.');
+              }
+
+              const products = await response.json();
+              productGrid.innerHTML = ''; // Clear existing products
+
               products.forEach(product => {
                   const imageUrl = product.image || "{% static 'main/images/thumb-avocado.png' %}";
-                  container.innerHTML += `
+                  productGrid.innerHTML += `
                       <div class="col">
                           <div class="product-item">
                               <a href="#" class="btn-wishlist"><svg width="24" height="24"><use xlink:href="#heart"></use></svg></a>
@@ -545,21 +590,165 @@
                       </div>
                   `;
               });
-  
-              // Initialize quantity controls for newly added products
+
+              // Reinitialize quantity controls for the new products
               initProductQty();
-          })
-          .catch(error => {
+          } catch (error) {
               console.error('Error fetching products:', error);
-              document.getElementById('product_grid').innerHTML = `
+              productGrid.innerHTML = `
                   <div class="alert alert-danger">
                       Failed to load products. Please try again later.
                   </div>
               `;
+          }
+      }
+
+      // Initialize quantity controls
+      function initProductQty() {
+          const qtyGroups = document.querySelectorAll('.product-qty');
+
+          qtyGroups.forEach(group => {
+              const minusBtn = group.querySelector('.quantity-left-minus');
+              const plusBtn = group.querySelector('.quantity-right-plus');
+              const input = group.querySelector('.quantity-input');
+
+              if (!input.value || isNaN(parseInt(input.value))) {
+                  input.value = 1;
+              }
+
+              minusBtn.addEventListener('click', function () {
+                  let currentValue = parseInt(input.value);
+                  if (currentValue > 1) {
+                      input.value = currentValue - 1;
+                  }
+              });
+
+              plusBtn.addEventListener('click', function () {
+                  let currentValue = parseInt(input.value);
+                  input.value = currentValue + 1;
+              });
           });
-  
-      // Initialize quantity controls for any static product items
-      initProductQty();
+      }
+
+      // Event listeners for ordering buttons
+      document.getElementById('create_ordering').addEventListener('click', function () {
+          fetchAndDisplayProducts('created_at');
+      });
+
+      document.getElementById('price_ordering').addEventListener('click', function () {
+          fetchAndDisplayProducts('price');
+      });
+
+      // Fetch and display products on page load
+      fetchAndDisplayProducts();
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const storeId = window.location.pathname.split('/').filter(Boolean).pop(); // Extract store ID from URL
+      const productGrid = document.getElementById('product_grid');
+      const searchInput = document.getElementById('search-input');
+      const searchIcon = document.getElementById('search-icon');
+
+      // Function to fetch and display products based on search query
+      async function fetchAndDisplayProducts(query = '') {
+          try {
+              const response = await fetch(`http://127.0.0.1:8000/en/api/store/products/${storeId}/?search=${encodeURIComponent(query)}`, {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+              });
+
+              if (!response.ok) {
+                  throw new Error('Failed to fetch products.');
+              }
+
+              const products = await response.json();
+              productGrid.innerHTML = ''; // Clear existing products
+
+              products.forEach(product => {
+                  const imageUrl = product.image || "{% static 'main/images/thumb-avocado.png' %}";
+                  productGrid.innerHTML += `
+                      <div class="col">
+                          <div class="product-item">
+                              <a href="#" class="btn-wishlist"><svg width="24" height="24"><use xlink:href="#heart"></use></svg></a>
+                              <figure>
+                                  <a href="http://127.0.0.1:8000/en/product/${product.id}/" title="${product.name}">
+                                      <img src="${imageUrl}" class="tab-image" alt="${product.name}">
+                                  </a>
+                              </figure>
+                              <h3>${product.name}</h3>
+                              <span class="qty">1 Unit</span><span class="rating"><svg width="24" height="24" class="text-primary"><use xlink:href="#star-solid"></use></svg> 4.5</span>
+                              <span class="price">$${product.price}</span>
+                              <div class="d-flex align-items-center justify-content-between">
+                                  <div class="input-group product-qty">
+                                      <span class="input-group-btn">
+                                          <button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus">
+                                              <svg width="16" height="16"><use xlink:href="#minus"></use></svg>
+                                          </button>
+                                      </span>
+                                      <input type="text" id="quantity" name="quantity" class="form-control input-number quantity-input" value="1">
+                                      <span class="input-group-btn">
+                                          <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus">
+                                              <svg width="16" height="16"><use xlink:href="#plus"></use></svg>
+                                          </button>
+                                      </span>
+                                  </div>
+                                  <a href="#" id="addtocart" class="nav-link" data-product-id=${product.id}>Add to Cart <iconify-icon icon="uil:shopping-cart"></a>
+                              </div>
+                          </div>
+                      </div>
+                  `;
+              });
+
+              // Reinitialize quantity controls for the new products
+              initProductQty();
+          } catch (error) {
+              console.error('Error fetching products:', error);
+              productGrid.innerHTML = `
+                  <div class="alert alert-danger">
+                      Failed to load products. Please try again later.
+                  </div>
+              `;
+          }
+      }
+
+      // Initialize quantity controls
+      function initProductQty() {
+          const qtyGroups = document.querySelectorAll('.product-qty');
+
+          qtyGroups.forEach(group => {
+              const minusBtn = group.querySelector('.quantity-left-minus');
+              const plusBtn = group.querySelector('.quantity-right-plus');
+              const input = group.querySelector('.quantity-input');
+
+              if (!input.value || isNaN(parseInt(input.value))) {
+                  input.value = 1;
+              }
+
+              minusBtn.addEventListener('click', function () {
+                  let currentValue = parseInt(input.value);
+                  if (currentValue > 1) {
+                      input.value = currentValue - 1;
+                  }
+              });
+
+              plusBtn.addEventListener('click', function () {
+                  let currentValue = parseInt(input.value);
+                  input.value = currentValue + 1;
+              });
+          });
+      }
+
+      // Handle search icon click
+      searchIcon.addEventListener('click', function () {
+          const query = searchInput.value.trim(); // Get the search query
+          fetchAndDisplayProducts(query); // Fetch and display products based on the search query
+      });
+
+      // Fetch and display products on page load
+      fetchAndDisplayProducts();
   });
 </script>
 

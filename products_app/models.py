@@ -50,7 +50,7 @@ class Product(models.Model):
     store = models.ForeignKey(Store, on_delete=models.PROTECT, blank=False, null=False)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, blank=False, null=False)
     brand = models.CharField(_("Brand Name"), max_length=50, blank=False, null=False)
-    descrition = models.TextField(_("Description"), blank=False, null=False)
+    description = models.TextField(_("Description"), blank=False, null=False)
     price = models.DecimalField(_("Price"), max_digits=10, decimal_places=2)
     image = models.ImageField(_("Image"), upload_to="products/", null=True)
     quantity = models.IntegerField(_("Quantity"), blank=False, null=False, editable=True)
