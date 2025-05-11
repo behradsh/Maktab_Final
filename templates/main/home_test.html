@@ -721,6 +721,10 @@
         const cartData = sessionStorage.getItem('Cart');
         return cartData ? JSON.parse(cartData) : {};
     }
+    // Helper function to save the cart to session storage
+    function saveCart(cart) {
+      sessionStorage.setItem('Cart', JSON.stringify(cart));
+  }
 
     // Function to update the cart display with product names
     function updateCartDisplay() {
@@ -752,7 +756,10 @@
                     <h6 class="my-0">${productName}</h6>
                     <small class="text-body-secondary">Quantity: ${quantity}</small>
                 </div>
-                <span class="text-body-secondary">$${price.toFixed(2)}</span>
+                <div class="d-flex align-items-center">
+                    <span class="text-body-secondary me-3">$${price.toFixed(2)}</span>
+                    <button class="btn btn-danger btn-sm remove-item" data-product-id="${productId}">{% trans "Remove" %}</button>
+                </div>
             `;
             cartItemsUl.appendChild(li);
 
@@ -774,7 +781,27 @@
 
         // Update the total item count in the UI
         cartCountsSpan.textContent = totalItems;
+        // Attach event listeners to the remove buttons
+        const removeButtons = document.querySelectorAll('.remove-item');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.dataset.productId;
+                removeFromCart(productId);
+            });
+        });
     }
+    function removeFromCart(productId) {
+      const cart = getCart();
+
+      if (productId in cart) {
+          delete cart[productId]; // Remove the product from the cart
+          saveCart(cart); // Save the updated cart to session storage
+          updateCartDisplay(); // Update the cart display
+      }
+  }
+
+  // Update the cart display on page load
+  updateCartDisplay();
 });
   </script>
 
