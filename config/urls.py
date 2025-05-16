@@ -26,6 +26,10 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, Toke
 # router = DefaultRouter()
 # router.register(r"category",CategoryView)
 # router.register(r"product",ProductView)
+admin.site.site_title = "FoodMart Admin Panel"
+admin.site.site_header = "FoodMart administration"
+admin.site.index_title = "FoodMart Website administration"
+
 
 
 urlpatterns=i18n_patterns(
