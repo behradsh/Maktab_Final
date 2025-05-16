@@ -27,7 +27,7 @@ CustomerRegisterTemplate,SellerRegisterTemplate,HomeTemplate,
 SellerDashboardTemplate,SellerDashboardChangePassTemplate,
 SellerOrderListView,SellerOrderUpdateView,SellerDashboardOrdersTemplate,
 SellerDashboardOrdersEditTemplate,CustomerOrderDetailsTemplate,
-HomePersianTemplate,
+HomePersianTemplate,SellerDashboardReportsTemplate,SellerReportsView,
                     )
 from orders_app.views import (CustomerOrderHistoryView,CustomerOrderDetailsView)
 from products_app.views import (CommentCreateView, UserCommentsListView)
@@ -93,6 +93,10 @@ urlpatterns = [
          name='seller_orders'),
     path('seller/dashboard/orders/<int:pk>/', SellerDashboardOrdersEditTemplate.as_view(),
          name='seller_orders_edit'),
+    path('api/seller/dashboard/report/', SellerReportsView.as_view(),
+         name='seller_reports_api'),
+    path('seller/dashboard/report/', SellerDashboardReportsTemplate.as_view(),
+         name='seller_reports'),
 
     # path('', include(router.urls)),
 ]

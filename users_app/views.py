@@ -1,6 +1,7 @@
 from itertools import count
 from django.views.generic import TemplateView
 from django.utils import timezone
+from django.db.models import Q,Sum,Count
 from datetime import timedelta
 import random
 from rest_framework import (generics, status, views, permissions, viewsets)
@@ -22,7 +23,7 @@ from .serializers import (UserRegisterSerializer,
                           AddressSerializer,
                           CustomerProfileSerializer,
                           SellerProfileSerializer,
-                          SellerChangePasswordSerializer, )
+                          SellerChangePasswordSerializer,SellerReportSerializer )
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.utils.translation import gettext_lazy as _
@@ -605,7 +606,8 @@ class SellerReportsView(generics.GenericAPIView):
     """
     view for report store details to seller
     """
-    permission_classes = [permissions.IsAuthenticated, IsSellerOrNot, IsSellerOwner]
+    serializer_class = SellerReportSerializer
+    permission_classes = [permissions.IsAuthenticated, IsSellerOwner]
 
     def get(self, request, *args, **kwargs):
         try:
@@ -613,42 +615,49 @@ class SellerReportsView(generics.GenericAPIView):
             time_filter = request.query_params.get('time_filter', 'all')
             orders = store.orders.all()
 
-            # Apply time filter if specified
-            if time_filter != 'all':
-                time_filters = {
-                    'daily': 1,
-                    'weekly': 7,
-                    'monthly': 30,
-                    'quarterly': 90,
-                    'yearly': 365
-                }
-                if time_filter in time_filters:
-                    start_date = timezone.now() - timedelta(days=time_filters[time_filter])
-                    orders = orders.filter(created_at__gte=start_date)
-                else:
-                    raise ValueError("Invalid time filter")
+            time_filters = {
+                'daily': 1,
+                'weekly': 7,
+                'monthly': 30,
+                'quarterly': 90,
+                'yearly': 365
+            }
+
+            # Separate logic for all time and other filters
+            if time_filter == 'all':
+                filtered_orders = orders
+                best_selling_query = OrderItems.objects.filter(order__store=store)
+            elif time_filter in time_filters:
+                start_date = timezone.now() - timedelta(days=time_filters[time_filter])
+                filtered_orders = orders.filter(created_at__gte=start_date)
+                best_selling_query = OrderItems.objects.filter(
+                    order__store=store,
+                    order__created_at__gte=start_date
+                )
+            else:
+                return Response(
+                    {"detail": "Invalid time filter"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             # Calculate total sales
-            sales_agg = orders.aggregate(
-                total_orders=count('id'),
-                total_revenue=sum('total_amount')
+            sales_agg = filtered_orders.aggregate(
+                total_orders=Count('id'),
+                total_revenue=Sum('total_amount')
             )
 
-            # Get best selling products
-            best_selling = OrderItems.objects.filter(
-                order__store=store,
-                order__created_at__gte=start_date if time_filter != 'all' else None
-            ).values(
+            # Get best-selling products
+            best_selling = best_selling_query.values(
                 'product__id',
                 'product__name'
             ).annotate(
-                total_quantity=sum('quantity'),
-                total_sales=sum('price')
+                total_quantity=Sum('quantity'),
+                total_sales=Sum('price')
             ).order_by('-total_quantity')[:5]
 
             # Get order status distribution
-            status_distribution = orders.values('status').annotate(
-                count=count('id')
+            status_distribution = filtered_orders.values('status').annotate(
+                count=Count('id')
             ).order_by('-count')
 
             return Response({
@@ -740,3 +749,6 @@ class SellerDashboardOrdersTemplate(TemplateView):
 
 class SellerDashboardOrdersEditTemplate(TemplateView):
     template_name = "dashboards/seller_dashboard_orders_edit.html"
+
+class SellerDashboardReportsTemplate(TemplateView):
+    template_name = "dashboards/seller_dashboard_reports.html"

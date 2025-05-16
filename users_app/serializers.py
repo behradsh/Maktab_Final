@@ -374,4 +374,13 @@ class SellerChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({"new_password": "Password fields didn't match."})
         return attrs
 
-
+class SellerReportSerializer(serializers.Serializer):
+    time_period = serializers.CharField()
+    total_orders = serializers.IntegerField()
+    total_revenue = serializers.FloatField()
+    best_selling_products = serializers.ListField(
+        child=serializers.DictField()
+    )
+    order_status_distribution = serializers.ListField(
+        child=serializers.DictField()
+    )

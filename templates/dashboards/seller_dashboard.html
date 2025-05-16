@@ -81,6 +81,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                                 Categories
                             </a>
+                            <a class="nav-link" id="seller_reports">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                Reports
+                            </a>
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">
@@ -351,6 +355,20 @@
               
               // Redirect to the dashboard with tokens as parameters
               window.location.href = `{% url 'category_list' %}`;
+          });
+        </script>
+        <script>
+
+            document.getElementById('seller_reports').addEventListener('click', function(e) {
+              // Prevent the default link behavior
+              e.preventDefault();
+                                            // Get tokens from local storage
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+              
+              // Redirect to the dashboard with tokens as parameters
+              window.location.href = `{% url 'seller_reports' %}`;
           });
         </script>
         <script>

@@ -45,7 +45,7 @@
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Home</div>
-                            <a class="nav-link" href="{% url 'seller_dashboard' %}">
+                            <a class="nav-link" href="#">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
@@ -68,23 +68,23 @@
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                                <div class="sb-sidenav-menu-heading"></div>
-                                <a class="nav-link" id="seller_products">
-                                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                                    Products List
-                                </a>
-                                <a class="nav-link" id="seller_create_product">
-                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                    Add Products
-                                </a>
-                                <a class="nav-link" id="seller_categories">
-                                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                                    Categories
-                                </a>
-                                <a class="nav-link" id="seller_reports">
-                                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                                    Reports
-                                </a>
+                            <div class="sb-sidenav-menu-heading"></div>
+                            <a class="nav-link" id="seller_products">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                Products List
+                            </a>
+                            <a class="nav-link" id="seller_create_product">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Add Products
+                            </a>
+                            <a class="nav-link" id="seller_categories">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                Categories
+                            </a>
+                            <a class="nav-link" id="seller_reports">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                Reports
+                            </a>
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">
@@ -95,14 +95,21 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Change Password</h1>
-                        <section id='change_password_section'>
-
-                        </section>
-                        
-                        <div class="row">
-                            
+                        <h1 class="mt-4">{% trans "Store Reports" %}</h1>
+                        <div class="mb-4">
+                            <label for="time_filter" class="form-label">{% trans "Filter by Time Period" %}</label>
+                            <select id="time_filter" class="form-select">
+                                <option value="all">{% trans "All Time" %}</option>
+                                <option value="daily">{% trans "Daily" %}</option>
+                                <option value="weekly">{% trans "Weekly" %}</option>
+                                <option value="monthly">{% trans "Monthly" %}</option>
+                                <option value="quarterly">{% trans "Quarterly" %}</option>
+                                <option value="yearly">{% trans "Yearly" %}</option>
+                            </select>
                         </div>
+                        <section id="store_report_section">
+                            <!-- Report details will be dynamically added here -->
+                        </section>
                     </div>
                 </main>
                 <footer class="py-4 bg-light mt-auto">
@@ -115,7 +122,7 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="{% static 'dashboards/css/js/scripts.js' %}"></script>
+        <script src="{% static 'dashboards/js/scripts.js' %}"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
         <script>
             // Function to fetch user profile and populate the form
@@ -187,68 +194,79 @@
             document.addEventListener('DOMContentLoaded', fetchUserProfile);
         </script>
         <script>
-            // Function to populate the change password form
-            function populateChangePasswordForm() {
-                const changePasswordSection = document.getElementById('change_password_section');
-                changePasswordSection.innerHTML = `
-                    <form id="changePasswordForm">
-                        <div class="mb-3">
-                            <label for="old_password" class="form-label">Old Password</label>
-                            <input type="password" class="form-control" id="old_password" name="old_password" required />
-                        </div>
-                        <div class="mb-3">
-                            <label for="new_password" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="new_password" name="new_password" required />
-                        </div>
-                        <div class="mb-3">
-                            <label for="new_password2" class="form-label">Repeat New Password</label>
-                            <input type="password" class="form-control" id="new_password2" name="new_password2" required />
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="submitChangePassword()">Change Password</button>
-                    </form>
-                `;
-            }
-        
-            // Function to submit the change password form
-            async function submitChangePassword() {
-                const accessToken = localStorage.getItem('accessToken');
-                if (!accessToken) {
-                    console.error('Access token is missing.');
-                    return;
-                }
-        
-                const form = document.getElementById('changePasswordForm');
-                const formData = {
-                    old_password: form.old_password.value,
-                    new_password: form.new_password.value,
-                    new_password2: form.new_password2.value
-                };
-        
-                try {
-                    const response = await fetch('http://127.0.0.1:8000/en/api/seller/dashboard/profile/change_password/', {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(formData)
-                    });
-        
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.old_password || errorData.new_password || 'Failed to change password.');
+            document.addEventListener('DOMContentLoaded', function () {
+                const timeFilter = document.getElementById('time_filter');
+                const reportSection = document.getElementById('store_report_section');
+    
+                // Function to fetch and display reports
+                async function fetchReports(timeFilterValue = 'all') {
+                    try {
+                        const response = await fetch(`http://127.0.0.1:8000/en/api/seller/dashboard/report/?time_filter=${timeFilterValue}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+    
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch reports.');
+                        }
+    
+                        const data = await response.json();
+                        displayReports(data);
+                    } catch (error) {
+                        console.error('Error fetching reports:', error);
+                        reportSection.innerHTML = `
+                            <div class="alert alert-danger">
+                                {% trans "Failed to load reports. Please try again later." %}
+                            </div>
+                        `;
                     }
-        
-                    alert('Password changed successfully!');
-                    window.location.href = `{% url 'seller_dashboard' %}`; // Redirect to the profile page
-                } catch (error) {
-                    console.error('Error changing password:', error);
-                    alert(error.message);
                 }
-            }
-        
-            // Populate the change password form on page load
-            document.addEventListener('DOMContentLoaded', populateChangePasswordForm);
+    
+                // Function to display reports
+                function displayReports(data) {
+                    reportSection.innerHTML = `
+                        <div class="mb-4">
+                            <h5>{% trans "Time Period:" %} ${data.time_period}</h5>
+                            <p>{% trans "Total Orders:" %} ${data.total_orders}</p>
+                            <p>{% trans "Total Revenue:" %} $${data.total_revenue.toFixed(2)}</p>
+                        </div>
+                        <div class="mb-4">
+                            <h5>{% trans "Best Selling Products" %}</h5>
+                            <ul class="list-group">
+                                ${data.best_selling_products.map(product => `
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        ${product.product__name}
+                                        <span>{% trans "Quantity:" %} ${product.total_quantity}</span>
+                                        <span>{% trans "Sales:" %} $${product.total_sales.toFixed(2)}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="mb-4">
+                            <h5>{% trans "Order Status Distribution" %}</h5>
+                            <ul class="list-group">
+                                ${data.order_status_distribution.map(status => `
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        ${status.status}
+                                        <span>{% trans "Count:" %} ${status.count}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+    
+                // Fetch reports on page load
+                fetchReports();
+    
+                // Fetch reports when the time filter changes
+                timeFilter.addEventListener('change', function () {
+                    fetchReports(this.value);
+                });
+            });
         </script>
         <script>
             document.getElementById('logout_btn').addEventListener('click', async function(e) {
@@ -383,6 +401,7 @@
               window.location.href = `{% url 'category_list' %}`;
           });
         </script>
+        
           
     </body>
 </html>
