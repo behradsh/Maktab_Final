@@ -84,11 +84,11 @@ class Comment(models.Model):
         (4, "4"),
         (5, "5"))
     STATUS_CHOICES = ((_("approved"), _("Approved")), (_("waiting"), _("Waiting")), (_("deny"), _("Deny")))
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='comment')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(CustomUser, on_delete=models.PROTECT, related_name='comment')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='comments')
     rating = models.IntegerField(null=False, blank=False, choices=RATE_CHOICES)
     description = models.TextField(null=False, blank=False)
-    reply_comment = models.ForeignKey('self', on_delete=models.CASCADE, related_name='child_comments', blank=True,
+    reply_comment = models.ForeignKey('self', on_delete=models.PROTECT, related_name='child_comments', blank=True,
                                       null=True)
     status = models.CharField(_("Status"), choices=STATUS_CHOICES, blank=False, null=False,
                               default=STATUS_CHOICES[1][0])

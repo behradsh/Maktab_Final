@@ -312,6 +312,40 @@
           </div>
       </div>
   </section>
+  <section id="product_comments_section" class="container my-5">
+    <!-- Comment Submit Form -->
+    <div id="comment_form_div" class="mb-4">
+      <h5>{% trans "Submit a Comment" %}</h5>
+      <form id="commentForm" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="rating" class="form-label">{% trans "Rating" %}</label>
+          <select id="rating" name="rating" class="form-select" required>
+            <option value="">{% trans "Select rating" %}</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">{% trans "Comment" %}</label>
+          <textarea id="description" name="description" class="form-control" rows="3" required></textarea>
+        </div>
+        <input type="hidden" id="reply_comment" name="reply_comment" />
+        <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
+        <button type="button" id="cancel_reply" class="btn btn-secondary d-none ms-2">{% trans "Cancel Reply" %}</button>
+      </form>
+    </div>
+  
+    <!-- Comments List -->
+    <div id="comments_list_div">
+      <h5>{% trans "Comments" %}</h5>
+      <div id="comments_container"></div>
+    </div>
+  </section>
+  
 
     <footer class="py-5">
       <div class="container-fluid">
@@ -424,7 +458,7 @@
               // Populate product details
               document.getElementById('productName').textContent = product.name;
               document.getElementById('productBrand').textContent = `Brand: ${product.brand}`;
-              document.getElementById('productDescription').textContent = product.descrition;
+              document.getElementById('productDescription').textContent = product.description;
               document.getElementById('productPrice').textContent = product.price;
               document.getElementById('storeLink').href = `/en/stores/${product.store}/`;
               document.getElementById('storeLink').textContent = 'Visit Store';
@@ -478,6 +512,182 @@
       // Fetch product details on page load
       document.addEventListener('DOMContentLoaded', fetchProductDetails);
   </script>
+  <script>
+    // CSRF helper functions
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    
+    const commentsEndpoint = `http://127.0.0.1:8000/en/api/comments/product/${productId}/`;
+    const submitEndpoint = `http://127.0.0.1:8000/en/api/comment/product/${productId}/`;
+    
+    const commentForm = document.getElementById('commentForm');
+    const replyCommentInput = document.getElementById('reply_comment');
+    const cancelReplyBtn = document.getElementById('cancel_reply');
+    const commentsContainer = document.getElementById('comments_container');
+    
+    let commentsData = [];
+    
+    // Fetch and render comments
+    async function fetchComments() {
+      try {
+        const res = await fetch(commentsEndpoint);
+        if (!res.ok) throw new Error('Failed to fetch comments');
+        commentsData = await res.json();
+        renderComments();
+      } catch (err) {
+        commentsContainer.innerHTML = `<div class="alert alert-danger">Failed to load comments.</div>`;
+      }
+    }
+    
+    // Helper: Build a tree of comments (for replies)
+    function buildCommentTree(comments) {
+      const map = {};
+      const roots = [];
+      comments.forEach(c => {
+        c.child_comments = [];
+        map[c.id] = c;
+      });
+      comments.forEach(c => {
+        if (c.reply_comment) {
+          if (map[c.reply_comment]) map[c.reply_comment].child_comments.push(c);
+        } else {
+          roots.push(c);
+        }
+      });
+      return roots;
+    }
+    
+    // Render comments recursively
+    function renderComments() {
+      commentsContainer.innerHTML = '';
+      const tree = buildCommentTree(commentsData);
+      tree.forEach(comment => {
+        commentsContainer.appendChild(renderCommentNode(comment));
+      });
+    }
+    
+    // Render a single comment (and its replies)
+    function renderCommentNode(comment, level = 0) {
+      const div = document.createElement('div');
+      div.className = 'mb-3';
+      div.style.marginLeft = `${level * 32}px`;
+    
+      // Format created_at as "YYYY-MM-DD HH:mm"
+      let createdAtDisplay = comment.created_at;
+      if (createdAtDisplay) {
+        const dateObj = new Date(createdAtDisplay);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const hours = String(dateObj.getHours()).padStart(2, '0');
+        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        createdAtDisplay = `${year}-${month}-${day} ${hours}:${minutes}`;
+      }
+    
+      div.innerHTML = `
+        <div class="border rounded p-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>${comment.user_username}</strong>
+              <span class="badge bg-warning text-dark ms-2">${comment.rating} ★</span>
+            </div>
+            <small class="text-muted">${createdAtDisplay}</small>
+          </div>
+          <div class="mt-2">${comment.description}</div>
+          <div class="mt-2">
+            <button class="btn btn-sm btn-outline-primary reply-btn" data-comment-id="${comment.id}">{% trans "Reply" %}</button>
+          </div>
+        </div>
+      `;
+      // Add replies
+      if (comment.child_comments && comment.child_comments.length > 0) {
+        comment.child_comments.forEach(reply => {
+          div.appendChild(renderCommentNode(reply, level + 1));
+        });
+      }
+      return div;
+    }
+    
+    // Handle reply button click
+    commentsContainer.addEventListener('click', function(e) {
+      if (e.target.classList.contains('reply-btn')) {
+        const commentId = e.target.getAttribute('data-comment-id');
+        replyCommentInput.value = commentId;
+        cancelReplyBtn.classList.remove('d-none');
+        commentForm.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+    
+    // Cancel reply
+    cancelReplyBtn.addEventListener('click', function() {
+      replyCommentInput.value = '';
+      cancelReplyBtn.classList.add('d-none');
+    });
+    
+    // Handle comment form submit
+    commentForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        alert('You must be logged in to comment.');
+        return;
+      }
+      const data = {
+        rating: commentForm.rating.value,
+        description: commentForm.description.value
+      };
+      if (replyCommentInput.value) {
+        data.reply_comment = replyCommentInput.value;
+      }
+      try {
+        const res = await fetch(submitEndpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+          },
+          body: JSON.stringify(data)
+        });
+        if (res.status === 401) {
+          alert('You must be logged in to comment.');
+          return;
+        }
+        if (!res.ok) {
+          const errData = await res.json();
+          let msg = '';
+          for (const key in errData) {
+            msg += `${key}: ${errData[key].join(', ')}\n`;
+          }
+          alert(msg || 'Failed to submit comment.');
+          return;
+        }
+        commentForm.reset();
+        replyCommentInput.value = '';
+        cancelReplyBtn.classList.add('d-none');
+        fetchComments();
+      } catch (err) {
+        alert('Failed to submit comment.');
+      }
+    });
+    
+    // Initial load
+    fetchComments();
+    </script>
   </body>
 </html>
 

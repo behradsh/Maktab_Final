@@ -8,13 +8,14 @@ from .views import (SellerProductListCreateView, SellerProductRetrieveUpdateDest
                     SellerCategoryCreateTemplate, SellerCategoryUpdateTemplate,
                     SellerCategoryListTemplate, ProductPageTemplate, ProductDetailsView, CategoryDetailView,
                     search_products, CustomerSubmitCommentsView, CustomerDashboardSubmitCommentsTemplate,
-                    StorePageProductDetails)
+                    StorePageProductDetails,ProductsCommentsList)
 
 urlpatterns = [
     path('api/search/', search_products, name='search_products'),
     path('api/store/products/<int:pk>/', StorePageProductDetails.as_view(), name='store_product_list'),
     path('api/products/', ProductListHomeView.as_view(), name='product_list_home'),
     path('api/products/<int:pk>/', ProductDetailsView.as_view(), name='product_detail_api'),
+    path('api/comments/product/<int:pk>/', ProductsCommentsList.as_view() , name='product_comments_api'),
     path('product/<int:pk>/', ProductPageTemplate.as_view(), name='product_page'),
     path('api/category/', CategoryListHomeView.as_view(), name='category_list_home'),
     path('api/category/<int:pk>/', CategoryDetailView.as_view(), name='category_detail_api'),
@@ -35,6 +36,8 @@ urlpatterns = [
     path('customer/dashboard/comments/', CustomerCommentsListTemplate.as_view(), name='customer_comments'),
     path('api/customer/dashboard/comments/product/<int:pk>/', CustomerSubmitCommentsView.as_view(),
          name='customer_comments_submit_api'),
+    path('api/comment/product/<int:pk>/', CustomerSubmitCommentsView.as_view(),
+         name='customer_comments_submit_api2'),
     path('customer/dashboard/comments/product/<int:pk>/', CustomerDashboardSubmitCommentsTemplate.as_view(),
          name='customer_comments_submit'),
     path('api/customer/dashboard/comments/create/', CommentCreateView.as_view(), name='customer_comments_create_api'),

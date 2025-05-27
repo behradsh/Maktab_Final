@@ -14,7 +14,7 @@ from store_app.models import Store, StoreEmployee
 from rest_framework import viewsets
 from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
-
+from django.db.models import Q
 
 # Create your views here.
 
@@ -212,6 +212,13 @@ class CustomerSubmitCommentsView(generics.ListCreateAPIView):
             print(f"Validation Error: {e}")
             raise
 
+class ProductsCommentsList(generics.ListAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = []
+    def get_queryset(self):
+        product_id = self.kwargs.get('pk')
+        comments = Comment.objects.filter(Q(product=product_id) & Q(status='approved'))
+        return comments
 
 def search_products(request):
     """

@@ -46,11 +46,15 @@ class CommentSerializer(serializers.ModelSerializer):
     created_at_shamsi = serializers.SerializerMethodField()
     updated_at_shamsi = serializers.SerializerMethodField()
     product_name = serializers.CharField(source='product.name', read_only=True)
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+    user_username = serializers.EmailField(source='user.username', read_only=True)
 
     class Meta:
         model = Comment
-        fields = ['id', 'product_name', 'rating', 'description', 'status', 'created_at', 'created_at_shamsi',
-                  'updated_at_shamsi']
+        fields = [
+            'id', 'user', 'user_email','user_username', 'product_name', 'rating', 'description',
+            'reply_comment', 'status', 'created_at', 'created_at_shamsi', 'updated_at_shamsi'
+        ]
         read_only_fields = ['created_at_shamsi', 'updated_at_shamsi']
 
     def get_created_at_shamsi(self, obj):
